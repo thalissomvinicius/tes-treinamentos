@@ -22,6 +22,9 @@ export const metadata: Metadata = {
     "curso",
     "certificado",
   ],
+  icons: {
+    icon: "/icon.svg",
+  },
 };
 
 export default function RootLayout({
