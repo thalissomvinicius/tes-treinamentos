@@ -18,21 +18,26 @@ export default function LoginPage() {
         setLoading(true)
         setError('')
 
-        const { error: signInError } = await supabase.auth.signInWithPassword({
-            email,
-            password,
-        })
-        if (signInError) {
-            if (signInError.message === 'Invalid login credentials') {
-                setError('E-mail ou senha incorretos.')
+        try {
+            const { error: signInError } = await supabase.auth.signInWithPassword({
+                email,
+                password,
+            })
+            if (signInError) {
+                if (signInError.message === 'Invalid login credentials') {
+                    setError('E-mail ou senha incorretos.')
+                } else {
+                    setError(signInError.message)
+                }
             } else {
-                setError(signInError.message)
+                window.location.href = '/dashboard'
             }
-        } else {
-            window.location.href = '/dashboard'
+        } catch (err: any) {
+            console.error('Login error:', err)
+            setError(err.message || 'Erro inesperado ao tentar entrar.')
+        } finally {
+            setLoading(false)
         }
-
-        setLoading(false)
     }
 
     return (
