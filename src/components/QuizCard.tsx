@@ -5,10 +5,12 @@ import type { QuizQuestion } from '@/lib/quizzes'
 
 interface QuizCardProps {
     questions: QuizQuestion[]
-    onComplete?: () => void
+    onComplete?: (passed: boolean, score: number) => void
+    passingPercentage?: number
+    title?: string
 }
 
-export default function QuizCard({ questions, onComplete }: QuizCardProps) {
+export default function QuizCard({ questions, onComplete, passingPercentage = 50, title = 'Quiz de Fixação' }: QuizCardProps) {
     const [currentIndex, setCurrentIndex] = useState(0)
     const [selectedOption, setSelectedOption] = useState<number | null>(null)
     const [isAnswered, setIsAnswered] = useState(false)
@@ -33,12 +35,13 @@ export default function QuizCard({ questions, onComplete }: QuizCardProps) {
             setIsAnswered(false)
         } else {
             setFinished(true)
-            if (onComplete) onComplete()
+            const passed = (correctCount + (selectedOption === question.correct ? 1 : 0)) >= Math.ceil(questions.length * (passingPercentage / 100))
+            if (onComplete) onComplete(passed, correctCount + (selectedOption === question.correct ? 1 : 0))
         }
     }
 
     if (finished) {
-        const isPassed = correctCount >= Math.ceil(questions.length * 0.5)
+        const isPassed = correctCount >= Math.ceil(questions.length * (passingPercentage / 100))
         const scorePercentage = Math.round((correctCount / questions.length) * 100)
         return (
             <div className="bg-white rounded-3xl border border-slate-100 shadow-xl shadow-blue-100/20 overflow-hidden">
@@ -105,7 +108,7 @@ export default function QuizCard({ questions, onComplete }: QuizCardProps) {
                 <div className="relative z-10">
                     <div className="flex items-center justify-between mb-3">
                         <h3 className="text-white font-extrabold flex items-center gap-2 text-lg">
-                            <span>📝</span> Quiz de Fixação
+                            <span>📝</span> {title}
                         </h3>
                         <span className="text-white/70 text-sm font-bold bg-white/10 backdrop-blur-sm px-3 py-1 rounded-full">
                             {currentIndex + 1} de {questions.length}
@@ -117,10 +120,10 @@ export default function QuizCard({ questions, onComplete }: QuizCardProps) {
                             <div
                                 key={i}
                                 className={`h-1.5 flex-1 rounded-full transition-all duration-500 ${i < currentIndex
-                                        ? 'bg-white'
-                                        : i === currentIndex
-                                            ? 'bg-white/60'
-                                            : 'bg-white/15'
+                                    ? 'bg-white'
+                                    : i === currentIndex
+                                        ? 'bg-white/60'
+                                        : 'bg-white/15'
                                     }`}
                             />
                         ))}

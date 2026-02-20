@@ -49,6 +49,14 @@ const MODULES = [
         order: 5,
         gradient: 'from-indigo-500 to-indigo-600',
     },
+    {
+        slug: 'prova-final',
+        title: 'Prova Final',
+        description: 'Avaliação final com 10 questões. Acerte 70% para liberar seu certificado.',
+        icon: '🏁',
+        order: 6,
+        gradient: 'from-slate-800 to-slate-900',
+    },
 ]
 
 export default function DashboardPage() {
@@ -204,22 +212,26 @@ export default function DashboardPage() {
                             {user && <ProgressBar userId={user.id} />}
 
                             {/* Download Handout (Apostila) */}
-                            <div className="bg-white rounded-3xl p-6 border border-slate-200 shadow-sm transition-all hover:shadow-md hover:border-blue-200 group">
+                            <div className="bg-slate-900 rounded-3xl p-6 border border-slate-800 shadow-xl shadow-slate-200 transition-all hover:scale-[1.02] group relative overflow-hidden">
+                                <div className="absolute top-0 right-0 w-24 h-24 bg-white/5 rounded-full -translate-y-1/2 translate-x-1/2" />
                                 <div className="flex items-center gap-3 mb-4">
-                                    <div className="w-10 h-10 bg-blue-100 text-blue-700 rounded-xl flex items-center justify-center text-xl group-hover:scale-110 transition-transform">
-                                        📚
+                                    <div className="w-10 h-10 bg-white/10 text-white rounded-xl flex items-center justify-center text-xl">
+                                        📄
                                     </div>
-                                    <h3 className="font-bold text-slate-800">Material de Apoio</h3>
+                                    <h3 className="font-bold text-white">Apostila Completa</h3>
                                 </div>
-                                <p className="text-sm text-slate-500 mb-5 leading-relaxed">
-                                    Tenha todo o conteúdo do curso em um só lugar. Baixe nossa apostila profissional completa em PDF.
+                                <p className="text-sm text-slate-400 mb-5 leading-relaxed">
+                                    Acesse o manual técnico em <strong>PDF</strong> com todo o conteúdo para consulta rápida.
                                 </p>
                                 <a
                                     href="/apostila"
                                     target="_blank"
-                                    className="block w-full text-center bg-slate-900 hover:bg-black text-white text-sm font-bold py-3.5 rounded-2xl transition-all shadow-lg shadow-slate-200 hover:-translate-y-0.5"
+                                    className="block w-full text-center bg-blue-600 hover:bg-blue-500 text-white text-sm font-bold py-3.5 rounded-2xl transition-all shadow-lg flex items-center justify-center gap-2"
                                 >
-                                    Baixar Apostila Completa
+                                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+                                    </svg>
+                                    Baixar Manual PDF
                                 </a>
                             </div>
 
@@ -241,7 +253,7 @@ export default function DashboardPage() {
                             {MODULES.map((mod, idx) => (
                                 <div key={mod.slug} className={`animate-slide-up stagger-${idx + 1}`}>
                                     <ModuleCard
-                                        slug={mod.slug}
+                                        slug={mod.slug === 'prova-final' ? '../../prova' : mod.slug}
                                         title={mod.title}
                                         description={mod.description}
                                         icon={mod.icon}

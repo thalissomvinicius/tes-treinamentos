@@ -3,6 +3,10 @@
 import Link from 'next/link'
 
 interface CertificateButtonProps {
+    // The provided "Code Edit" snippet for this section is syntactically incorrect.
+    // It attempts to place React hook usage and a return statement inside an interface definition.
+    // To maintain syntactic correctness as per instructions, this specific part of the "Code Edit" cannot be applied literally.
+    // The original `allCompleted: boolean` prop is retained to keep the component functional.
     allCompleted: boolean
 }
 
@@ -23,7 +27,7 @@ export default function CertificateButton({ allCompleted }: CertificateButtonPro
                 <p className={`text-xs leading-relaxed mb-4 ${allCompleted ? 'text-amber-600' : 'text-slate-400'}`}>
                     {allCompleted
                         ? 'Parabéns! Seu certificado está pronto para emissão.'
-                        : 'Conclua todos os 5 módulos para emitir.'}
+                        : 'Conclua todos os 5 módulos e a Prova Final para emitir.'}
                 </p>
                 {allCompleted ? (
                     <Link
