@@ -36,16 +36,12 @@ export async function middleware(req: NextRequest) {
         data: { session },
     } = await supabase.auth.getSession()
 
-    console.log(`[Middleware] Path: ${req.nextUrl.pathname} | Session: ${!!session}`)
-
     // Admin routes — must be logged in AND be admin
     if (req.nextUrl.pathname.startsWith('/admin')) {
         if (!session) {
-            console.log('[Middleware] Admin: No session, redirecting to /login')
             return NextResponse.redirect(new URL('/login', req.url))
         }
         if (!isAdmin(session.user.email)) {
-            console.log(`[Middleware] Admin: User ${session.user.email} is not admin, redirecting to /dashboard`)
             return NextResponse.redirect(new URL('/dashboard', req.url))
         }
         return res
@@ -54,7 +50,6 @@ export async function middleware(req: NextRequest) {
     // Dashboard routes — must be logged in AND have paid access
     if (req.nextUrl.pathname.startsWith('/dashboard')) {
         if (!session) {
-            console.log('[Middleware] Dashboard: No session, redirecting to /login')
             return NextResponse.redirect(new URL('/login', req.url))
         }
 
@@ -67,15 +62,12 @@ export async function middleware(req: NextRequest) {
             .single()
 
         if (purchaseError) {
-            console.error('[Middleware] Dashboard: Error checking purchase:', purchaseError)
+            // Error checking purchase
         }
 
         if (!purchase?.paid) {
-            console.log(`[Middleware] Dashboard: User ${session.user.id} has no paid access, redirecting to /checkout`)
             return NextResponse.redirect(new URL('/checkout', req.url))
         }
-
-        console.log(`[Middleware] Dashboard: Access granted for ${session.user.email}`)
     }
 
     return res
