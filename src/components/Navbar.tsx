@@ -1,6 +1,7 @@
 'use client'
 
 import Link from 'next/link'
+import { useRouter } from 'next/navigation'
 import { useState, useEffect } from 'react'
 import { supabase } from '@/lib/supabase'
 import { isAdmin } from '@/lib/admin'
@@ -8,6 +9,8 @@ import { isAdmin } from '@/lib/admin'
 export default function Navbar({ isLoggedIn = false }: { isLoggedIn?: boolean }) {
     const [mobileOpen, setMobileOpen] = useState(false)
     const [isAdminUser, setIsAdminUser] = useState(false)
+
+    const router = useRouter()
 
     useEffect(() => {
         async function checkAdmin() {
@@ -19,6 +22,12 @@ export default function Navbar({ isLoggedIn = false }: { isLoggedIn?: boolean })
         }
         checkAdmin()
     }, [isLoggedIn])
+
+    async function handleLogout() {
+        await supabase.auth.signOut()
+        router.refresh()
+        window.location.href = '/'
+    }
 
     return (
         <nav className="fixed top-0 left-0 right-0 z-50 bg-white/80 backdrop-blur-xl border-b border-slate-200/60 shadow-sm">
@@ -58,12 +67,20 @@ export default function Navbar({ isLoggedIn = false }: { isLoggedIn?: boolean })
                             </Link>
                         )}
                         {isLoggedIn ? (
-                            <Link
-                                href="/dashboard"
-                                className="bg-blue-700 hover:bg-blue-800 text-white text-sm font-bold px-5 py-2.5 rounded-xl transition-all hover:shadow-lg hover:shadow-blue-700/25"
-                            >
-                                Meu Painel
-                            </Link>
+                            <div className="flex items-center gap-3">
+                                <Link
+                                    href="/dashboard"
+                                    className="bg-blue-700 hover:bg-blue-800 text-white text-sm font-bold px-5 py-2.5 rounded-xl transition-all hover:shadow-lg hover:shadow-blue-700/25"
+                                >
+                                    Meu Painel
+                                </Link>
+                                <button
+                                    onClick={handleLogout}
+                                    className="text-sm font-semibold text-slate-400 hover:text-red-500 transition-colors px-2"
+                                >
+                                    Sair
+                                </button>
+                            </div>
                         ) : (
                             <Link
                                 href="/login"
@@ -76,7 +93,7 @@ export default function Navbar({ isLoggedIn = false }: { isLoggedIn?: boolean })
 
                     {/* Mobile menu button */}
                     <button
-                        className="md:hidden p-2 rounded-lg text-slate-600 hover:bg-slate-100 transition"
+                        className="p-2 rounded-lg text-slate-600 hover:bg-slate-100 transition md:hidden"
                         onClick={() => setMobileOpen(!mobileOpen)}
                         aria-label="Menu"
                     >
@@ -118,6 +135,14 @@ export default function Navbar({ isLoggedIn = false }: { isLoggedIn?: boolean })
                         >
                             {isLoggedIn ? 'Meu Painel' : 'Entrar'}
                         </Link>
+                        {isLoggedIn && (
+                            <button
+                                onClick={handleLogout}
+                                className="block w-full text-center text-sm font-bold text-slate-400 hover:text-red-500 py-2 transition"
+                            >
+                                Sair da conta
+                            </button>
+                        )}
                     </div>
                 </div>
             )}
