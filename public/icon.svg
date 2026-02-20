@@ -1,4 +1,11 @@
 <svg width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
-  <rect width="32" height="32" rx="6" fill="#0F172A"/>
-  <text x="50%" y="55%" dominant-baseline="middle" text-anchor="middle" fill="#EAB308" style="font-family: serif; font-weight: bold; font-size: 14px;">T&amp;S</text>
+  <style>
+    .blue { fill: #2b59de; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; font-weight: 800; font-size: 16px; }
+    .gray { fill: #ccd6e0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; font-weight: 800; font-size: 14px; }
+  </style>
+  <text x="50%" y="55%" text-anchor="middle" dominant-baseline="middle">
+    <tspan class="blue">T</tspan>
+    <tspan class="gray" dx="-1">&amp;</tspan>
+    <tspan class="blue" dx="-1">S</tspan>
+  </text>
 </svg>
