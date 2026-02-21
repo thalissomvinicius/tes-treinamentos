@@ -19,15 +19,16 @@ export default function ApostilaPage() {
     return (
         <div className="min-h-screen bg-white text-slate-900 font-sans print:bg-white print:text-black overflow-x-hidden">
             {/* Botão de Impressão (Oculto na impressão) */}
-            <div className="fixed bottom-8 right-8 z-50 print:hidden sm:block hidden">
+            <div className="fixed bottom-24 right-6 sm:bottom-8 sm:right-8 z-50 print:hidden">
                 <button
                     onClick={() => window.print()}
-                    className="bg-blue-700 hover:bg-blue-800 text-white font-bold px-6 py-4 rounded-2xl shadow-2xl flex items-center gap-2 transition-all hover:scale-105 active:scale-95"
+                    className="bg-blue-700 hover:bg-blue-800 text-white font-bold p-4 sm:px-6 sm:py-4 rounded-2xl shadow-2xl flex items-center gap-2 transition-all hover:scale-105 active:scale-95"
                 >
                     <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z" />
                     </svg>
-                    Imprimir / Salvar PDF
+                    <span className="hidden sm:inline">Imprimir / Salvar PDF</span>
+                    <span className="sm:hidden text-xs">PDF</span>
                 </button>
             </div>
 
@@ -53,9 +54,9 @@ export default function ApostilaPage() {
                 </div>
 
                 {/* ────── CAPA ────── */}
-                <section className="min-h-[297mm] flex flex-col items-center justify-center text-center border-[20px] border-blue-900/5 p-12 relative overflow-hidden break-after-page print:border-none print:bg-white print:min-h-[257mm] print:pt-[20mm] print:pb-[15mm]">
-                    <div className="absolute top-0 right-0 w-96 h-96 bg-blue-50/50 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2 print:hidden" />
-                    <div className="absolute bottom-0 left-0 w-96 h-96 bg-blue-50/50 rounded-full blur-3xl translate-y-1/2 -translate-x-1/2 print:hidden" />
+                <section className="min-h-screen sm:min-h-[297mm] flex flex-col items-center justify-center text-center border-[10px] sm:border-[20px] border-blue-900/5 p-6 sm:p-12 relative overflow-hidden break-after-page print:border-none print:bg-white print:min-h-[257mm] print:pt-[20mm] print:pb-[15mm]">
+                    <div className="absolute top-0 right-0 w-64 h-64 sm:w-96 sm:h-96 bg-blue-50/50 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2 print:hidden" />
+                    <div className="absolute bottom-0 left-0 w-64 h-64 sm:w-96 sm:h-96 bg-blue-50/50 rounded-full blur-3xl translate-y-1/2 -translate-x-1/2 print:hidden" />
 
                     <div className="relative z-10">
                         <div className="flex items-center justify-center gap-3 mb-16">
@@ -70,7 +71,7 @@ export default function ApostilaPage() {
                             </div>
                         </div>
 
-                        <h1 className="text-5xl font-black text-slate-900 leading-tight mb-8 print:text-6xl">
+                        <h1 className="text-3xl sm:text-5xl font-black text-slate-900 leading-tight mb-8 print:text-6xl break-words">
                             eSocial na Prática <br />
                             <span className="text-blue-700">Segurança e Saúde no Trabalho</span>
                         </h1>
@@ -94,11 +95,11 @@ export default function ApostilaPage() {
                 </section>
 
                 {/* ────── SUMÁRIO ────── */}
-                <section className="py-16 px-12 break-after-page print:pt-[40mm] print:px-[20mm]">
-                    <h2 className="text-3xl font-bold text-blue-900 mb-12 flex items-center gap-3">
+                <section className="py-12 px-6 sm:py-16 sm:px-12 break-after-page print:pt-[40mm] print:px-[20mm]">
+                    <h2 className="text-2xl sm:text-3xl font-bold text-blue-900 mb-8 sm:mb-12 flex items-center gap-3">
                         Sumário 📚
                     </h2>
-                    <nav className="space-y-6">
+                    <nav className="space-y-4 sm:space-y-6">
                         {[
                             { id: 'm1', title: 'Fundamentos do eSocial na SST', p: '01' },
                             { id: 'm2', title: 'S-2210 | Comunicação de Acidente de Trabalho (CAT)', p: '04' },
@@ -107,20 +108,22 @@ export default function ApostilaPage() {
                             { id: 'm5', title: 'Considerações Finais e Checklist Prático', p: '16' },
                             { id: 'glos', title: 'Glossário de Termos Técnicos', p: '18' },
                         ].map((item, i) => (
-                            <div key={i} className="flex items-end gap-2 group cursor-pointer hover:text-blue-700 transition-colors">
-                                <span className="text-blue-900 font-bold text-lg min-w-[20px]">{i + 1}.</span>
-                                <span className="font-semibold text-slate-700 group-hover:text-blue-700 whitespace-nowrap">{item.title}</span>
-                                <div className="flex-1 border-b-2 border-dotted border-slate-200 mb-1.5" />
-                                <span className="text-slate-400 font-mono">{item.p}</span>
+                            <div key={i} className="flex flex-col sm:flex-row sm:items-end gap-1 sm:gap-2 group cursor-pointer hover:text-blue-700 transition-colors">
+                                <div className="flex items-center gap-2">
+                                    <span className="text-blue-900 font-bold text-base sm:text-lg min-w-[20px]">{i + 1}.</span>
+                                    <span className="font-semibold text-slate-700 group-hover:text-blue-700 leading-tight">{item.title}</span>
+                                </div>
+                                <div className="hidden sm:block flex-1 border-b-2 border-dotted border-slate-200 mb-1.5" />
+                                <span className="text-slate-400 font-mono text-xs sm:text-sm sm:ml-0 ml-7">{item.p}</span>
                             </div>
                         ))}
                     </nav>
                 </section>
 
                 {/* ────── MÓDULO 1 ────── */}
-                <article className="py-16 px-12 break-after-page print:pt-[40mm] print:px-[20mm]">
-                    <div className="text-blue-700 font-bold uppercase tracking-widest text-sm mb-4">Módulo 01</div>
-                    <h2 className="text-4xl font-extrabold text-blue-900 mb-8 border-b-4 border-blue-100 pb-4">
+                <article className="py-12 px-6 sm:py-16 sm:px-12 break-after-page print:pt-[40mm] print:px-[20mm]">
+                    <div className="text-blue-700 font-bold uppercase tracking-widest text-xs sm:text-sm mb-4">Módulo 01</div>
+                    <h2 className="text-2xl sm:text-4xl font-extrabold text-blue-900 mb-8 border-b-4 border-blue-100 pb-4">
                         Fundamentos do eSocial na SST
                     </h2>
 
@@ -173,9 +176,9 @@ export default function ApostilaPage() {
                 </article>
 
                 {/* ────── MÓDULO 2 ────── */}
-                <article className="py-16 px-12 break-after-page print:pt-[40mm] print:px-[20mm]">
-                    <div className="text-rose-600 font-bold uppercase tracking-widest text-sm mb-4">Módulo 02</div>
-                    <h2 className="text-4xl font-extrabold text-blue-900 mb-8 border-b-4 border-rose-100 pb-4">
+                <article className="py-12 px-6 sm:py-16 sm:px-12 break-after-page print:pt-[40mm] print:px-[20mm]">
+                    <div className="text-rose-600 font-bold uppercase tracking-widest text-xs sm:text-sm mb-4">Módulo 02</div>
+                    <h2 className="text-2xl sm:text-4xl font-extrabold text-blue-900 mb-8 border-b-4 border-rose-100 pb-4">
                         S-2210 | Comunicação de Acidente de Trabalho
                     </h2>
 
@@ -187,7 +190,7 @@ export default function ApostilaPage() {
                             </p>
 
                             <h4 className="font-bold text-slate-800 mb-4">Categorias de Acidente:</h4>
-                            <div className="grid grid-cols-2 gap-4 print:grid-cols-2">
+                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 print:grid-cols-2">
                                 <div className="p-4 bg-slate-50 rounded-xl border border-slate-100">
                                     <h4 className="font-bold text-rose-700 mb-1">Acidente Típico</h4>
                                     <p className="text-[11px] text-slate-500 font-medium">Ocorrendo durante a execução das tarefas laborais.</p>
@@ -251,9 +254,9 @@ export default function ApostilaPage() {
                 </article>
 
                 {/* ────── MÓDULO 3 ────── */}
-                <article className="py-16 px-12 break-after-page print:pt-[40mm] print:px-[20mm]">
-                    <div className="text-teal-600 font-bold uppercase tracking-widest text-sm mb-4">Módulo 03</div>
-                    <h2 className="text-4xl font-extrabold text-blue-900 mb-8 border-b-4 border-teal-100 pb-4">
+                <article className="py-12 px-6 sm:py-16 sm:px-12 break-after-page print:pt-[40mm] print:px-[20mm]">
+                    <div className="text-teal-600 font-bold uppercase tracking-widest text-xs sm:text-sm mb-4">Módulo 03</div>
+                    <h2 className="text-2xl sm:text-4xl font-extrabold text-blue-900 mb-8 border-b-4 border-teal-100 pb-4">
                         S-2220 | Monitoramento da Saúde (ASO)
                     </h2>
 
@@ -280,18 +283,18 @@ export default function ApostilaPage() {
                         </table>
                     </div>
 
-                    <div className="flex gap-8 mb-12">
+                    <div className="flex flex-col sm:flex-row gap-6 sm:gap-8 mb-12">
                         <div className="flex-1">
-                            <h3 className="text-xl font-bold text-slate-800 mb-4">Informações do Médico</h3>
-                            <ul className="space-y-2 text-slate-600">
+                            <h3 className="text-lg sm:text-xl font-bold text-slate-800 mb-4">Informações do Médico</h3>
+                            <ul className="space-y-2 text-slate-600 text-sm">
                                 <li className="flex items-start gap-2">• CRM e Nome do Médico examinador</li>
                                 <li className="flex items-start gap-2">• Nome do Médico Coordenador (PCMSO)</li>
                                 <li className="flex items-start gap-2">• Identificação completa da Clínica</li>
                             </ul>
                         </div>
                         <div className="flex-1">
-                            <h3 className="text-xl font-bold text-slate-800 mb-4">Exames Complementares</h3>
-                            <p className="text-sm text-slate-500 italic mb-4">Devem ser informados seguindo os códigos da **Tabela 27**:</p>
+                            <h3 className="text-lg sm:text-xl font-bold text-slate-800 mb-4">Exames Complementares</h3>
+                            <p className="text-xs sm:text-sm text-slate-500 italic mb-4">Devem ser informados seguindo os códigos da **Tabela 27**:</p>
                             <div className="grid grid-cols-2 gap-2 text-[10px] font-bold">
                                 <div className="p-2 bg-slate-50 border border-slate-100">0901 — Audiometria</div>
                                 <div className="p-2 bg-slate-50 border border-slate-100">0905 — Acuidade</div>
@@ -313,31 +316,31 @@ export default function ApostilaPage() {
                 </article>
 
                 {/* ────── MÓDULO 4 ────── */}
-                <article className="py-16 px-12 break-after-page print:pt-[40mm] print:px-[20mm]">
-                    <div className="text-amber-600 font-bold uppercase tracking-widest text-sm mb-4">Módulo 04</div>
-                    <h2 className="text-4xl font-extrabold text-blue-900 mb-8 border-b-4 border-amber-100 pb-4">
+                <article className="py-12 px-6 sm:py-16 sm:px-12 break-after-page print:pt-[40mm] print:px-[20mm]">
+                    <div className="text-amber-600 font-bold uppercase tracking-widest text-xs sm:text-sm mb-4">Módulo 04</div>
+                    <h2 className="text-2xl sm:text-4xl font-extrabold text-blue-900 mb-8 border-b-4 border-amber-100 pb-4">
                         S-2240 | Condições Ambientais e Agentes Nocivos
                     </h2>
 
                     <div className="prose prose-slate max-w-none">
                         <section className="mb-12">
                             <h3 className="text-xl font-bold text-slate-800 mb-6">Categorias de Agentes Nocivos</h3>
-                            <div className="grid grid-cols-2 gap-6 avoid-break-inside">
-                                <div className="p-6 bg-amber-50 rounded-3xl border border-amber-100">
-                                    <div className="text-lg font-bold mb-2">Químicos</div>
+                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6 avoid-break-inside">
+                                <div className="p-4 sm:p-6 bg-amber-50 rounded-2xl sm:rounded-3xl border border-amber-100">
+                                    <div className="text-base sm:text-lg font-bold mb-2">Químicos</div>
                                     <p className="text-[10px] text-amber-900/60 leading-relaxed font-medium">Poeiras, gases, vapores e substâncias tóxicas.</p>
                                 </div>
-                                <div className="p-6 bg-slate-50 rounded-3xl border border-slate-100">
-                                    <div className="text-lg font-bold mb-2 text-slate-700">Físicos</div>
+                                <div className="p-4 sm:p-6 bg-slate-50 rounded-2xl sm:rounded-3xl border border-slate-100">
+                                    <div className="text-base sm:text-lg font-bold mb-2 text-slate-700">Físicos</div>
                                     <p className="text-[10px] text-slate-500 leading-relaxed font-medium">Ruído, vibrações, calor e radiações.</p>
                                 </div>
-                                <div className="p-6 bg-slate-50 rounded-3xl border border-slate-100">
-                                    <div className="text-2xl mb-2 text-slate-700">Biológicos</div>
-                                    <p className="text-xs text-slate-500 leading-relaxed">Micro-organismos como vírus, bactérias e fungos (comum em hospitais).</p>
+                                <div className="p-4 sm:p-6 bg-slate-50 rounded-2xl sm:rounded-3xl border border-slate-100">
+                                    <div className="text-base sm:text-lg mb-2 text-slate-700">Biológicos</div>
+                                    <p className="text-[10px] text-slate-500 leading-relaxed">Micro-organismos como vírus, bactérias e fungos.</p>
                                 </div>
-                                <div className="p-6 bg-slate-50 rounded-3xl border border-slate-100">
-                                    <div className="text-2xl mb-2 text-slate-700">Ergonômicos</div>
-                                    <p className="text-xs text-slate-500 leading-relaxed">Repetitividade, posturas inadequadas e manuseio de carga excessiva.</p>
+                                <div className="p-4 sm:p-6 bg-slate-50 rounded-2xl sm:rounded-3xl border border-slate-100">
+                                    <div className="text-base sm:text-lg mb-2 text-slate-700">Ergonômicos</div>
+                                    <p className="text-[10px] text-slate-500 leading-relaxed">Repetitividade, posturas inadequadas e cargas.</p>
                                 </div>
                             </div>
                         </section>
@@ -370,9 +373,9 @@ export default function ApostilaPage() {
                 </article>
 
                 {/* ────── CONCLUSÃO ────── */}
-                <article className="py-16 px-12 break-after-page">
-                    <div className="text-indigo-600 font-bold uppercase tracking-widest text-sm mb-4">Módulo Final</div>
-                    <h2 className="text-4xl font-extrabold text-blue-900 mb-8 border-b-4 border-indigo-100 pb-4 text-center font-display">
+                <article className="py-12 px-6 sm:py-16 sm:px-12 break-after-page">
+                    <div className="text-indigo-600 font-bold uppercase tracking-widest text-xs sm:text-sm mb-4">Módulo Final</div>
+                    <h2 className="text-2xl sm:text-4xl font-extrabold text-blue-900 mb-8 border-b-4 border-indigo-100 pb-4 text-center font-display">
                         Checklist Estratégico SST
                     </h2>
 
@@ -413,11 +416,11 @@ export default function ApostilaPage() {
                 </article>
 
                 {/* ────── GLOSSÁRIO ────── */}
-                <section className="py-16 px-12">
-                    <h2 className="text-3xl font-bold text-slate-900 mb-12 flex items-center gap-3 italic">
+                <section className="py-12 px-6 sm:py-16 sm:px-12">
+                    <h2 className="text-2xl sm:text-3xl font-bold text-slate-900 mb-8 sm:mb-12 flex items-center gap-3 italic">
                         Glossário de Termos SST 📖
                     </h2>
-                    <div className="grid grid-cols-1 gap-6">
+                    <div className="grid grid-cols-1 gap-4 sm:gap-6">
                         {[
                             { t: 'ASO', d: 'Atestado de Saúde Ocupacional. Documento que declara se o trabalhador está apto para a função.' },
                             { t: 'CAT', d: 'Comunicação de Acidente de Trabalho. Documento obrigatório para registrar acidentes ou doenças.' },
@@ -427,9 +430,9 @@ export default function ApostilaPage() {
                             { t: 'LTCAT', d: 'Laudo Técnico das Condições Ambientais do Trabalho. Subsídio para aposentadoria especial.' },
                             { t: 'FAP', d: 'Fator Acidentário de Prevenção. Multiplicador sobre o RAT que depende da acidentalidade.' },
                         ].map((item, i) => (
-                            <div key={i} className="flex gap-6 pb-6 border-b border-slate-50">
-                                <div className="text-blue-700 font-black text-xl min-w-[100px]">{item.t}</div>
-                                <p className="text-sm text-slate-500 font-medium leading-relaxed">{item.d}</p>
+                            <div key={i} className="flex flex-col sm:flex-row gap-2 sm:gap-6 pb-4 sm:pb-6 border-b border-slate-50">
+                                <div className="text-blue-700 font-black text-lg sm:text-xl min-w-[100px]">{item.t}</div>
+                                <p className="text-xs sm:text-sm text-slate-500 font-medium leading-relaxed">{item.d}</p>
                             </div>
                         ))}
                     </div>
