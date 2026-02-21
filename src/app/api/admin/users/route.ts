@@ -99,6 +99,35 @@ function buildWelcomeEmailText(params: {
     ].join('\n')
 }
 
+async function upsertPurchase(params: {
+    supabase: ReturnType<typeof getSupabaseAdmin>
+    userId: string
+    email: string
+    paid: boolean
+}) {
+    const payload = {
+        email: params.email,
+        user_id: params.userId,
+        stripe_session_id: `admin-${Date.now()}`,
+        stripe_customer_id: `manual-${params.userId}`,
+        paid: params.paid,
+    }
+
+    const firstTry = await params.supabase
+        .from('purchases')
+        .upsert(payload, { onConflict: 'user_id' })
+
+    if (!firstTry.error) return { ok: true }
+
+    const secondTry = await params.supabase
+        .from('purchases')
+        .upsert(payload, { onConflict: 'email' })
+
+    if (!secondTry.error) return { ok: true }
+
+    return { ok: false, error: secondTry.error?.message || firstTry.error?.message || 'Erro ao liberar acesso' }
+}
+
 async function sendWelcomeEmail(params: {
     to: string
     name: string
@@ -239,17 +268,17 @@ export async function POST(req: NextRequest) {
         }
 
         // If granting access, create purchase record
+        let purchaseError: string | null = null
         if (grantAccess) {
-            await supabase.from('purchases').upsert(
-                {
-                    email,
-                    user_id: authUser.user.id,
-                    stripe_session_id: `admin-${Date.now()}`,
-                    stripe_customer_id: `manual-${authUser.user.id}`,
-                    paid: true,
-                },
-                { onConflict: 'user_id' }
-            )
+            const purchaseResult = await upsertPurchase({
+                supabase,
+                userId: authUser.user.id,
+                email,
+                paid: true,
+            })
+            if (!purchaseResult.ok) {
+                purchaseError = purchaseResult.error || 'Erro ao liberar acesso'
+            }
         }
 
         const origin = new URL(req.url).origin
@@ -270,10 +299,11 @@ export async function POST(req: NextRequest) {
                 email,
                 name: name || '',
                 created_at: authUser.user.created_at,
-                has_access: grantAccess || false,
+                has_access: !!grantAccess && !purchaseError,
             },
             email_sent: emailResult.sent,
             email_error: emailResult.sent ? null : emailResult.error,
+            purchase_error: purchaseError,
         })
     } catch (error) {
         console.error('Error in POST /api/admin/users:', error)
@@ -297,29 +327,30 @@ export async function PATCH(req: NextRequest) {
             return NextResponse.json({ error: 'userId é obrigatório' }, { status: 400 })
         }
 
+        const accessResult = grantAccess
         if (grantAccess) {
-            // Grant access — upsert purchase
-            await supabase.from('purchases').upsert(
-                {
-                    email: email || '',
-                    user_id: userId,
-                    stripe_session_id: `admin-${Date.now()}`,
-                    stripe_customer_id: `manual-${userId}`,
-                    paid: true,
-                },
-                { onConflict: 'user_id' }
-            )
+            const purchaseResult = await upsertPurchase({
+                supabase,
+                userId,
+                email: email || '',
+                paid: true,
+            })
+            if (!purchaseResult.ok) {
+                return NextResponse.json({ error: purchaseResult.error || 'Erro ao liberar acesso' }, { status: 500 })
+            }
         } else {
-            // Revoke access — update paid to false
-            await supabase
+            const { error: revokeError } = await supabase
                 .from('purchases')
                 .update({ paid: false })
                 .eq('user_id', userId)
+            if (revokeError) {
+                return NextResponse.json({ error: 'Erro ao revogar acesso' }, { status: 500 })
+            }
         }
 
         console.log(`✅ Access ${grantAccess ? 'granted' : 'revoked'} for user ${userId}`)
 
-        return NextResponse.json({ success: true, has_access: grantAccess })
+        return NextResponse.json({ success: true, has_access: accessResult })
     } catch (error) {
         console.error('Error in PATCH /api/admin/users:', error)
         return NextResponse.json({ error: 'Erro interno' }, { status: 500 })

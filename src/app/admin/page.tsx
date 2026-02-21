@@ -98,19 +98,28 @@ export default function AdminPage() {
             const data = await res.json()
 
             if (res.ok) {
+                const emailFailed = !data.email_sent
                 const emailStatus = data.email_sent
                     ? ' E-mail enviado com sucesso.'
                     : ` Usuário criado, mas o e-mail não foi enviado. ${data.email_error || ''}`.trim()
-                setFormSuccess(`✅ Usuário ${formEmail} criado com sucesso!${emailStatus}`)
+                if (data.purchase_error) {
+                    setFormError(`Usuário criado, mas o acesso não foi liberado. ${data.purchase_error}`)
+                } else if (emailFailed) {
+                    setFormError(emailStatus.replace(/^Usuário criado, mas /, ''))
+                } else {
+                    setFormSuccess(`✅ Usuário ${formEmail} criado com sucesso!${emailStatus}`)
+                }
                 setFormName('')
                 setFormEmail('')
                 setFormPassword('')
                 setFormAccess(true)
                 loadUsers()
-                setTimeout(() => {
-                    setShowForm(false)
-                    setFormSuccess('')
-                }, 2000)
+                if (!data.purchase_error && !emailFailed) {
+                    setTimeout(() => {
+                        setShowForm(false)
+                        setFormSuccess('')
+                    }, 2000)
+                }
             } else {
                 setFormError(data.error || 'Erro ao criar usuário')
             }
@@ -137,9 +146,10 @@ export default function AdminPage() {
             })
 
             if (res.ok) {
+                const data = await res.json()
                 setUsers(prev =>
                     prev.map(u =>
-                        u.id === user.id ? { ...u, has_access: !u.has_access } : u
+                        u.id === user.id ? { ...u, has_access: !!data.has_access } : u
                     )
                 )
             }
