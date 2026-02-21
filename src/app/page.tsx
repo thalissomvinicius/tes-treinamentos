@@ -360,8 +360,8 @@ export default function LandingPage() {
               </div>
               <div className="flex items-baseline justify-center gap-1 mb-2">
                 <span className="text-sm text-slate-500 font-semibold">R$</span>
-                <span className="text-5xl font-extrabold text-slate-900">97</span>
-                <span className="text-lg text-slate-500">,00</span>
+                <span className="text-5xl font-extrabold text-slate-900">99</span>
+                <span className="text-lg text-slate-500">,90</span>
               </div>
               <p className="text-slate-400 text-sm mb-8">
                 Pagamento único • Acesso vitalício

@@ -111,7 +111,7 @@ export async function generateCertificatePDF(props: CertificateProps): Promise<A
     doc.setFont('helvetica', 'normal')
     doc.setFontSize(11)
     doc.setTextColor(120, 120, 120)
-    doc.text('Carga horária total de 20 horas — Certificado emitido em conformidade com as normas vigentes.', w / 2 + 7.5, 148, { align: 'center' })
+    doc.text('Carga horária total de 40 horas — Certificado emitido em conformidade com as normas vigentes.', w / 2 + 7.5, 148, { align: 'center' })
 
     // ──────────────────────────────────────
     //  DIGITAL SEAL / BADGE (Circular Gold Seal)
