@@ -33,7 +33,7 @@ function ApostilaContent() {
 
             <div className="w-full max-w-[210mm] mx-auto bg-white p-0 sm:p-8 lg:p-12 shadow-none sm:shadow-2xl print:shadow-none print:p-0">
                 {/* ────── PRINT HEADER (Only visible on print) ────── */}
-                <div className="hidden print:block fixed top-0 left-0 right-0 h-[30mm] px-[20mm] py-8 bg-white z-[100] pointer-events-none">
+                <div className="print-only fixed top-0 left-0 right-0 h-[30mm] px-[20mm] py-8 bg-white z-[100] pointer-events-none">
                     <div className="flex justify-between items-center h-full border-b border-slate-200 pb-2">
                         <div className="flex items-center gap-2">
                             <span className="text-xl font-extrabold text-blue-800">T&S</span>
@@ -46,7 +46,7 @@ function ApostilaContent() {
                 </div>
 
                 {/* ────── PRINT FOOTER (Only visible on print) ────── */}
-                <div className="hidden print:block fixed bottom-0 left-0 right-0 h-[15mm] border-t border-slate-100 px-[20mm] py-4 bg-white z-[100] text-center pointer-events-none">
+                <div className="print-only fixed bottom-0 left-0 right-0 h-[15mm] border-t border-slate-100 px-[20mm] py-4 bg-white z-[100] text-center pointer-events-none">
                     <div className="text-[8px] font-bold text-slate-300 uppercase tracking-widest">
                         © {new Date().getFullYear()} T&S CURSOS • DOCUMENTO PARA USO DIDÁTICO • WWW.TES-TREINAMENTOS.VERCEL.APP
                     </div>
@@ -438,7 +438,7 @@ function ApostilaContent() {
                 </section>
 
                 {/* Footer de Página */}
-                <footer className="mt-12 sm:mt-20 py-6 sm:py-8 border-t border-slate-100 flex flex-col sm:flex-row justify-between items-center gap-4 text-[9px] sm:text-[10px] text-slate-300 font-bold uppercase tracking-widest px-6 sm:px-12 print:hidden text-center sm:text-left">
+                <footer className="mt-8 sm:mt-20 py-4 sm:py-8 border-t border-slate-100 flex flex-col sm:flex-row justify-between items-center gap-2 sm:gap-4 text-[8px] sm:text-[10px] text-slate-300 font-bold uppercase tracking-widest px-6 sm:px-12 print:hidden text-center sm:text-left">
                     <div>T&S Cursos • Material Técnico Autorizado</div>
                     <div>Página {new Date().toLocaleDateString('pt-BR')}</div>
                 </footer>
@@ -457,10 +457,12 @@ function ApostilaContent() {
                         print-color-adjust: exact;
                     }
                     .print-hidden { display: none !important; }
+                    .print-only { display: block !important; }
                     .avoid-break-inside { break-inside: avoid; }
                     .avoid-break-after { break-after: avoid; }
                     .break-after-page { page-break-after: always; }
                 }
+                .print-only { display: none !important; }
                 .break-after-page {
                     break-after: page;
                 }
