@@ -17,7 +17,7 @@ function ApostilaContent() {
             const element = containerRef.current
 
             const canvas = await html2canvas(element, {
-                scale: 1.0,
+                scale: 1.5,
                 useCORS: true,
                 logging: false,
                 backgroundColor: '#ffffff',
@@ -29,45 +29,120 @@ function ApostilaContent() {
                     const hazard = clonedDoc.querySelectorAll('.blur-3xl, .blur-2xl, [class*="bg-blue-50/50"], [class*="bg-gradient-"]') as NodeListOf<HTMLElement>
                     hazard.forEach(el => el.remove())
 
+                    const defaultView = clonedDoc.defaultView
+                    const colorCache = new Map<string, string>()
+                    const isUnsupported = (val: string) => /lab\(|okl|color\(|lch\(/i.test(val)
+                    const isTransparent = (val: string) => val === 'transparent' || val === 'rgba(0, 0, 0, 0)' || val === 'rgb(0 0 0 / 0)'
+                    const toSafe = (val: string | null | undefined, fallback: string) => {
+                        if (!val) return fallback
+                        if (isTransparent(val)) return val
+                        const cached = colorCache.get(val)
+                        if (cached) return cached
+                        let safe = val
+                        if (isUnsupported(val)) {
+                            const temp = clonedDoc.createElement('span')
+                            temp.style.color = val
+                            clonedDoc.body.appendChild(temp)
+                            const computed = defaultView?.getComputedStyle(temp).color || val
+                            temp.remove()
+                            safe = isUnsupported(computed) ? fallback : computed
+                        }
+                        colorCache.set(val, safe)
+                        return safe
+                    }
+
                     const allElements = clonedDoc.querySelectorAll('*') as NodeListOf<HTMLElement>
                     allElements.forEach(el => {
-                        el.style.setProperty('color', 'rgb(30, 41, 59)', 'important')
-                        el.style.setProperty('background-color', 'rgb(255, 255, 255)', 'important')
-                        el.style.setProperty('border-color', 'rgb(226, 232, 240)', 'important')
-                        el.style.setProperty('outline-color', 'rgb(226, 232, 240)', 'important')
-                        el.style.setProperty('text-decoration-color', 'rgb(100, 116, 139)', 'important')
-                        el.style.setProperty('caret-color', 'rgb(30, 41, 59)', 'important')
-                        el.style.setProperty('column-rule-color', 'rgb(226, 232, 240)', 'important')
+                        const style = defaultView?.getComputedStyle(el)
+                        if (!style) return
+
+                        el.style.setProperty('color', toSafe(style.color, 'rgb(30, 41, 59)'), 'important')
+                        el.style.setProperty('background-color', toSafe(style.backgroundColor, 'transparent'), 'important')
+                        el.style.setProperty('border-top-color', toSafe(style.borderTopColor, 'transparent'), 'important')
+                        el.style.setProperty('border-bottom-color', toSafe(style.borderBottomColor, 'transparent'), 'important')
+                        el.style.setProperty('border-left-color', toSafe(style.borderLeftColor, 'transparent'), 'important')
+                        el.style.setProperty('border-right-color', toSafe(style.borderRightColor, 'transparent'), 'important')
+                        el.style.setProperty('outline-color', toSafe(style.outlineColor, 'transparent'), 'important')
+                        el.style.setProperty('text-decoration-color', toSafe(style.textDecorationColor, 'transparent'), 'important')
+                        el.style.setProperty('caret-color', toSafe(style.caretColor, 'rgb(30, 41, 59)'), 'important')
+                        el.style.setProperty('column-rule-color', toSafe(style.columnRuleColor, 'transparent'), 'important')
                         el.style.setProperty('box-shadow', 'none', 'important')
                         el.style.setProperty('filter', 'none', 'important')
-                        el.style.setProperty('background-image', 'none', 'important')
-                        el.style.setProperty('fill', 'rgb(30, 41, 59)', 'important')
-                        el.style.setProperty('stroke', 'rgb(30, 41, 59)', 'important')
+                        if (style.backgroundImage && (isUnsupported(style.backgroundImage) || style.backgroundImage.includes('gradient'))) {
+                            el.style.setProperty('background-image', 'none', 'important')
+                        }
+                        if (style.fill && style.fill !== 'none') {
+                            el.style.setProperty('fill', toSafe(style.fill, 'rgb(30, 41, 59)'), 'important')
+                        }
+                        if (style.stroke && style.stroke !== 'none') {
+                            el.style.setProperty('stroke', toSafe(style.stroke, 'rgb(30, 41, 59)'), 'important')
+                        }
                     })
                 }
             })
 
-            const imgData = canvas.toDataURL('image/jpeg', 0.95)
             const pdf = new jsPDF('p', 'mm', 'a4')
-
             const pdfWidth = pdf.internal.pageSize.getWidth()
             const pdfHeight = pdf.internal.pageSize.getHeight()
-            const imgWidth = canvas.width
-            const imgHeight = canvas.height
-            const ratio = pdfWidth / imgWidth
-            const totalPdfHeight = imgHeight * ratio
+            const margin = 8
+            const contentWidth = pdfWidth - margin * 2
+            const ratio = contentWidth / canvas.width
+            const pageHeightPx = (pdfHeight - margin * 2) / ratio
+            const ctx = canvas.getContext('2d')
 
-            let heightLeft = totalPdfHeight
-            let position = 0
+            const findBreak = (targetY: number) => {
+                if (!ctx) return targetY
+                const minY = Math.max(0, Math.floor(targetY - 40))
+                const maxY = Math.min(canvas.height - 1, Math.floor(targetY + 40))
+                let bestY = targetY
+                let bestScore = -1
+                const sampleStep = 4
+                for (let y = minY; y <= maxY; y += 2) {
+                    const row = ctx.getImageData(0, y, canvas.width, 1).data
+                    let whiteCount = 0
+                    for (let i = 0; i < row.length; i += 4 * sampleStep) {
+                        const r = row[i]
+                        const g = row[i + 1]
+                        const b = row[i + 2]
+                        const a = row[i + 3]
+                        if (a === 0 || (r > 245 && g > 245 && b > 245)) {
+                            whiteCount++
+                        }
+                    }
+                    if (whiteCount > bestScore) {
+                        bestScore = whiteCount
+                        bestY = y
+                    }
+                }
+                return bestY
+            }
 
-            pdf.addImage(imgData, 'JPEG', 0, position, pdfWidth, totalPdfHeight)
-            heightLeft -= pdfHeight
+            let y = 0
+            let pageIndex = 0
+            while (y < canvas.height) {
+                const remaining = canvas.height - y
+                let sliceHeight = Math.min(pageHeightPx, remaining)
+                if (remaining > pageHeightPx) {
+                    const target = y + sliceHeight
+                    const breakY = findBreak(target)
+                    sliceHeight = Math.max(40, breakY - y)
+                }
 
-            while (heightLeft >= 0) {
-                position = heightLeft - totalPdfHeight
-                pdf.addPage()
-                pdf.addImage(imgData, 'JPEG', 0, position, pdfWidth, totalPdfHeight)
-                heightLeft -= pdfHeight
+                const pageCanvas = document.createElement('canvas')
+                pageCanvas.width = canvas.width
+                pageCanvas.height = Math.floor(sliceHeight)
+                const pageCtx = pageCanvas.getContext('2d')
+                if (pageCtx) {
+                    pageCtx.drawImage(canvas, 0, y, canvas.width, sliceHeight, 0, 0, canvas.width, sliceHeight)
+                }
+                const pageImg = pageCanvas.toDataURL('image/jpeg', 0.95)
+                if (pageIndex > 0) {
+                    pdf.addPage()
+                }
+                const renderHeight = sliceHeight * ratio
+                pdf.addImage(pageImg, 'JPEG', margin, margin, contentWidth, renderHeight)
+                y += sliceHeight
+                pageIndex += 1
             }
 
             pdf.save(`Apostila_eSocial_SST_TS_Cursos.pdf`)
