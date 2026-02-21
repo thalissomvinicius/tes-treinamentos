@@ -27,20 +27,25 @@ function ApostilaContent() {
 
             const element = containerRef.current
 
-            // Força a visibilidade dos elementos "print-only" durante a captura
+            // Força a visibilidade dos elementos "print-only" e remove filtros problemáticos (blur)
             const printOnlyElements = element.querySelectorAll('.print-only') as NodeListOf<HTMLElement>
             printOnlyElements.forEach(el => el.style.display = 'block')
 
+            // Remove temporariamente filtros de blur que fazem o html2canvas falhar
+            const blurredElements = element.querySelectorAll('[class*="blur-"]') as NodeListOf<HTMLElement>
+            blurredElements.forEach(el => el.style.filter = 'none')
+
             const canvas = await html2canvas(element, {
-                scale: 2, // Aumenta a qualidade
+                scale: 1.5, // Equilíbrio entre qualidade e memória
                 useCORS: true,
                 logging: false,
                 backgroundColor: '#ffffff',
-                windowWidth: 794, // Largura aproximada de A4 em pixels (96 DPI)
+                windowWidth: element.scrollWidth || 794,
             })
 
-            // Restaura a ocultação dos elementos
+            // Restaura o estado original
             printOnlyElements.forEach(el => el.style.display = '')
+            blurredElements.forEach(el => el.style.filter = '')
 
             const imgData = canvas.toDataURL('image/jpeg', 0.95)
             const pdf = new jsPDF('p', 'mm', 'a4')
@@ -70,9 +75,10 @@ function ApostilaContent() {
             }
 
             pdf.save(`Apostila_eSocial_SST_TS_Cursos.pdf`)
-        } catch (error) {
-            console.error('Erro ao gerar PDF:', error)
-            alert('Erro ao gerar o PDF. Por favor, tente imprimir usando o botão de impressão comum.')
+        } catch (error: unknown) {
+            console.error('Erro detalhado ao gerar PDF:', error)
+            const errorMessage = error instanceof Error ? error.message : 'Erro desconhecido'
+            alert(`Erro ao gerar o PDF: ${errorMessage}. Por favor, tente usar o botão azul de "Imprimir / Salvar PDF" do próprio navegador.`)
         } finally {
             setIsDownloading(false)
         }
