@@ -38,18 +38,20 @@ function ApostilaContent() {
                     const printOnly = clonedDoc.querySelectorAll('.print-only') as NodeListOf<HTMLElement>
                     printOnly.forEach(el => el.style.display = 'block')
 
-                    // 2. Sanitizador de Estilos Modernos (Evita erro "oklab")
+                    // 2. Sanitizador Nuclear de Estilos (Limpeza total de OKLCH/OKLAB)
                     const allElements = clonedDoc.querySelectorAll('*') as NodeListOf<HTMLElement>
                     allElements.forEach(el => {
                         const style = window.getComputedStyle(el)
 
-                        // Limpa filtros
-                        if (style.filter && style.filter !== 'none') el.style.filter = 'none'
+                        // Detecta se a cor/estilo é incompatível com o gerador
+                        const isBad = (val: string) => val && (val.includes('oklch') || val.includes('oklab'))
 
-                        // Substitui cores OKLCH/OKLAB por fallbacks seguros
-                        if (style.color.includes('okl')) el.style.color = '#1e293b'
-                        if (style.backgroundColor.includes('okl')) el.style.backgroundColor = '#ffffff'
-                        if (style.borderColor.includes('okl')) el.style.borderColor = '#e2e8f0'
+                        if (isBad(style.color)) el.style.color = '#1e293b'
+                        if (isBad(style.backgroundColor)) el.style.backgroundColor = '#ffffff'
+                        if (isBad(style.borderColor)) el.style.borderColor = '#e2e8f0'
+                        if (isBad(style.boxShadow)) el.style.boxShadow = 'none'
+                        if (isBad(style.filter)) el.style.filter = 'none'
+
                         if (style.backgroundImage && style.backgroundImage.includes('okl')) {
                             el.style.backgroundImage = 'none'
                             el.style.backgroundColor = '#1d4ed8' // Azul T&S
