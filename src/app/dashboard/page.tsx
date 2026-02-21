@@ -66,6 +66,7 @@ export default function DashboardPage() {
     const [user, setUser] = useState<{ id: string; email: string } | null>(null)
     const [completedModules, setCompletedModules] = useState<string[]>([])
     const [loading, setLoading] = useState(true)
+    const [isDownloadingHandout, setIsDownloadingHandout] = useState(false)
 
     const completedSet = new Set(completedModules)
     const allModulesCompleted = CORE_MODULE_SLUGS.every((slug) => completedSet.has(slug))
@@ -103,6 +104,21 @@ export default function DashboardPage() {
     async function handleLogout() {
         await supabase.auth.signOut()
         router.push('/')
+    }
+
+    function handleDownloadHandout() {
+        if (isDownloadingHandout) return
+        setIsDownloadingHandout(true)
+        const iframe = document.createElement('iframe')
+        iframe.style.display = 'none'
+        iframe.src = '/apostila'
+        document.body.appendChild(iframe)
+        window.setTimeout(() => {
+            if (iframe.parentNode) {
+                iframe.parentNode.removeChild(iframe)
+            }
+            setIsDownloadingHandout(false)
+        }, 6000)
     }
 
     if (loading) {
@@ -229,17 +245,21 @@ export default function DashboardPage() {
                                 <p className="text-sm text-slate-400 mb-5 leading-relaxed">
                                     Acesse o manual técnico em <strong>PDF</strong> com todo o conteúdo para consulta rápida.
                                 </p>
-                                <a
-                                    href="/apostila"
-                                    target="_blank"
-                                    rel="noopener noreferrer"
-                                    className="block w-full text-center bg-blue-600 hover:bg-blue-500 text-white text-sm font-bold py-3.5 rounded-2xl transition-all shadow-lg flex items-center justify-center gap-2"
+                                <button
+                                    type="button"
+                                    onClick={handleDownloadHandout}
+                                    disabled={isDownloadingHandout}
+                                    className="block w-full text-center bg-blue-600 hover:bg-blue-500 text-white text-sm font-bold py-3.5 rounded-2xl transition-all shadow-lg flex items-center justify-center gap-2 disabled:opacity-60 disabled:cursor-not-allowed"
                                 >
-                                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
-                                    </svg>
-                                    Baixar Manual PDF
-                                </a>
+                                    {isDownloadingHandout ? (
+                                        <div className="w-4 h-4 border-2 border-white/60 border-t-transparent rounded-full animate-spin" />
+                                    ) : (
+                                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+                                        </svg>
+                                    )}
+                                    {isDownloadingHandout ? 'Gerando PDF...' : 'Baixar Manual PDF'}
+                                </button>
                             </div>
 
                             {/* Certificate CTA */}
