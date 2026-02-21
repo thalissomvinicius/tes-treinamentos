@@ -20,6 +20,115 @@ async function verifyAdmin(req: NextRequest) {
     return null
 }
 
+function buildAdminWelcomeEmailHtml(params: {
+    name: string
+    email: string
+    password: string
+    loginUrl: string
+}) {
+    const { name, email, password, loginUrl } = params
+
+    return `
+        <!DOCTYPE html>
+        <html lang="pt-BR">
+        <head>
+            <meta charset="UTF-8">
+            <meta name="viewport" content="width=device-width, initial-scale=1.0">
+            <title>Acesso Administrativo - T&S Cursos</title>
+            <style>
+                @media only screen and (max-width: 600px) {
+                    .container { padding: 10px !important; }
+                    .content { padding: 20px 15px !important; }
+                    .header { padding: 20px 15px !important; }
+                    h1 { font-size: 18px !important; }
+                    p { font-size: 14px !important; }
+                    .btn { display: block !important; width: 100% !important; max-width: none !important; box-sizing: border-box !important; }
+                }
+            </style>
+        </head>
+        <body style="margin:0;padding:0;background-color:#f1f5f9;font-family:'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;color:#0f172a;">
+            <div class="container" style="max-width:600px;margin:0 auto;padding:40px 20px;">
+                <!-- Header -->
+                <div class="header" style="background:linear-gradient(135deg, #b45309 0%, #78350f 100%);border-radius:24px 24px 0 0;padding:40px 30px;text-align:center;color:#ffffff;position:relative;overflow:hidden;">
+                    <!-- Decorative Circle -->
+                    <div style="position:absolute;top:-50px;left:-50px;width:150px;height:150px;background:rgba(255,255,255,0.05);border-radius:50%;"></div>
+                    
+                    <div style="font-size:24px;font-weight:800;letter-spacing:0.05em;margin-bottom:8px;">T&amp;S CURSOS</div>
+                    <div style="font-size:12px;color:#fef3c7;font-weight:600;text-transform:uppercase;letter-spacing:0.15em;background:rgba(0,0,0,0.2);padding:4px 12px;border-radius:99px;display:inline-block;">Acesso Administrativo</div>
+                </div>
+
+                <!-- Main Content -->
+                <div class="content" style="background:#ffffff;border-radius:0 0 24px 24px;padding:40px 30px;box-shadow:0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);">
+                    <h1 style="font-size:22px;font-weight:700;margin:0 0 16px;color:#1e293b;text-align:center;">
+                        Bem-vindo ao Time, ${name ? name : 'Admin'}!
+                    </h1>
+                    
+                    <p style="margin:0 0 24px;font-size:16px;line-height:1.6;color:#475569;text-align:center;">
+                        Sua conta de administrador foi criada com sucesso. Você agora tem acesso total ao painel de gestão da plataforma.
+                    </p>
+
+                    <!-- Credentials Box -->
+                    <div style="background:#fffbeb;border:1px solid #fcd34d;border-radius:16px;padding:24px;margin:30px 0;">
+                        <div style="text-align:center;font-size:12px;color:#92400e;font-weight:600;text-transform:uppercase;letter-spacing:0.05em;margin-bottom:12px;">Suas Credenciais de Admin</div>
+                        
+                        <div style="margin-bottom:12px;">
+                            <div style="font-size:13px;color:#b45309;margin-bottom:4px;">E-mail de acesso</div>
+                            <div style="font-size:16px;color:#0f172a;font-weight:600;font-family:monospace;">${email}</div>
+                        </div>
+                        
+                        <div>
+                            <div style="font-size:13px;color:#b45309;margin-bottom:4px;">Senha temporária</div>
+                            <div style="font-size:16px;color:#0f172a;font-weight:600;font-family:monospace;background:#fef3c7;padding:4px 8px;border-radius:6px;display:inline-block;">${password}</div>
+                        </div>
+                    </div>
+
+                    <!-- CTA Button -->
+                    <div style="text-align:center;margin:30px 0;">
+                        <a href="${loginUrl}" class="btn" style="display:inline-block;background:#d97706;color:#ffffff;text-decoration:none;font-weight:600;padding:16px 32px;border-radius:12px;font-size:16px;box-shadow:0 4px 6px -1px rgba(217, 119, 6, 0.2);transition:background 0.2s;">
+                            Acessar Painel Admin
+                        </a>
+                    </div>
+
+                    <!-- Security Notice -->
+                    <div style="background:#f8fafc;border-radius:12px;padding:16px;font-size:13px;color:#64748b;line-height:1.5;text-align:center;">
+                        <strong>⚠️ Importante:</strong> Por questões de segurança, recomendamos que você altere sua senha imediatamente após o primeiro acesso.
+                    </div>
+                </div>
+
+                <!-- Footer -->
+                <div style="text-align:center;margin-top:30px;color:#94a3b8;font-size:12px;">
+                    <p style="margin:0;">© ${new Date().getFullYear()} T&S Cursos. Uso interno e confidencial.</p>
+                </div>
+            </div>
+        </body>
+        </html>
+    `
+}
+
+function buildAdminWelcomeEmailText(params: {
+    name: string
+    email: string
+    password: string
+    loginUrl: string
+}) {
+    const { name, email, password, loginUrl } = params
+
+    return [
+        `Bem-vindo ao Time, ${name ? name : 'Admin'}!`,
+        '',
+        'Sua conta de administrador foi criada com sucesso.',
+        'Você agora tem acesso total ao painel de gestão da plataforma.',
+        '',
+        'SUAS CREDENCIAIS:',
+        `E-mail: ${email}`,
+        `Senha: ${password}`,
+        '',
+        `Acesse o painel: ${loginUrl}`,
+        '',
+        'IMPORTANTE: Por questões de segurança, altere sua senha após o primeiro acesso.',
+    ].join('\n')
+}
+
 function buildWelcomeEmailHtml(params: {
     name: string
     email: string
@@ -239,6 +348,7 @@ async function sendWelcomeEmail(params: {
     grantAccess: boolean
     adminEmail: string
     origin: string
+    isAdminUser?: boolean
 }) {
     const host = process.env.SMTP_HOST
     const port = Number(process.env.SMTP_PORT || 465)
@@ -260,25 +370,47 @@ async function sendWelcomeEmail(params: {
     const loginUrl = `${params.origin}/login`
 
     try {
+        const subject = params.isAdminUser
+            ? 'Acesso Administrativo - T&S Cursos'
+            : 'Bem-vindo à T&S Cursos — Dados de acesso'
+
+        const textContent = params.isAdminUser
+            ? buildAdminWelcomeEmailText({
+                name: params.name,
+                email: params.to,
+                password: params.password,
+                loginUrl,
+            })
+            : buildWelcomeEmailText({
+                name: params.name,
+                email: params.to,
+                password: params.password,
+                loginUrl,
+                grantAccess: params.grantAccess,
+            })
+
+        const htmlContent = params.isAdminUser
+            ? buildAdminWelcomeEmailHtml({
+                name: params.name,
+                email: params.to,
+                password: params.password,
+                loginUrl,
+            })
+            : buildWelcomeEmailHtml({
+                name: params.name,
+                email: params.to,
+                password: params.password,
+                loginUrl,
+                grantAccess: params.grantAccess,
+            })
+
         await transporter.sendMail({
             from: `T&S Cursos <${fromAddress}>`,
             to: params.to,
             replyTo: params.adminEmail,
-            subject: 'Bem-vindo à T&S Cursos — Dados de acesso',
-            text: buildWelcomeEmailText({
-                name: params.name,
-                email: params.to,
-                password: params.password,
-                loginUrl,
-                grantAccess: params.grantAccess,
-            }),
-            html: buildWelcomeEmailHtml({
-                name: params.name,
-                email: params.to,
-                password: params.password,
-                loginUrl,
-                grantAccess: params.grantAccess,
-            }),
+            subject,
+            text: textContent,
+            html: htmlContent,
         })
         return { sent: true }
     } catch (error) {
@@ -394,6 +526,7 @@ export async function POST(req: NextRequest) {
             grantAccess: !!grantAccess,
             adminEmail,
             origin,
+            isAdminUser: !!isAdminUser,
         })
 
         console.log(`✅ User created by admin: ${email} (access: ${grantAccess ? 'yes' : 'no'})`)
@@ -486,6 +619,16 @@ export async function DELETE(req: NextRequest) {
 
         if (!userId) {
             return NextResponse.json({ error: 'userId é obrigatório' }, { status: 400 })
+        }
+
+        // Security check: Protect main admin
+        const { data: userToDelete, error: fetchError } = await supabase.auth.admin.getUserById(userId)
+        if (fetchError || !userToDelete?.user) {
+            return NextResponse.json({ error: 'Usuário não encontrado' }, { status: 404 })
+        }
+
+        if (userToDelete.user.email === 'thalissomvinicius7@gmail.com') {
+            return NextResponse.json({ error: 'Ação não permitida: Este é o administrador principal.' }, { status: 403 })
         }
 
         // Delete purchase record
