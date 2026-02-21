@@ -27,36 +27,35 @@ function ApostilaContent() {
 
             const element = containerRef.current
 
-            // Força a visibilidade dos elementos "print-only" e remove filtros problemáticos (blur e oklab/oklch)
-            const printOnlyElements = element.querySelectorAll('.print-only') as NodeListOf<HTMLElement>
-            printOnlyElements.forEach(el => el.style.display = 'block')
-
-            // Remove temporariamente filtros e cores problemáticas (oklab/oklch não suportados pelo html2canvas)
-            const problematicElements = element.querySelectorAll('[class*="blur-"], [class*="bg-gradient-"]') as NodeListOf<HTMLElement>
-            problematicElements.forEach(el => {
-                el.style.filter = 'none'
-                el.style.backgroundImage = 'none' // Remove gradientes oklch que travam o gerador
-                el.style.backgroundColor = '#1d4ed8' // Fallback para um azul sólido seguro se for um elemento vital
-            })
-
             const canvas = await html2canvas(element, {
-                scale: 1.5,
+                scale: 1.2,
                 useCORS: true,
                 logging: false,
                 backgroundColor: '#ffffff',
                 windowWidth: element.scrollWidth || 794,
-                ignoreElements: (el) => {
-                    // Ignora elementos que sabemos que usam cores problemáticas se não forem essenciais
-                    return el.classList.contains('blur-3xl') || el.classList.contains('bg-blue-50/50')
-                }
-            })
+                onclone: (clonedDoc) => {
+                    // 1. Força visibilidade dos elementos de impressão
+                    const printOnly = clonedDoc.querySelectorAll('.print-only') as NodeListOf<HTMLElement>
+                    printOnly.forEach(el => el.style.display = 'block')
 
-            // Restaura o estado original
-            printOnlyElements.forEach(el => el.style.display = '')
-            problematicElements.forEach(el => {
-                el.style.filter = ''
-                el.style.backgroundImage = ''
-                el.style.backgroundColor = ''
+                    // 2. Sanitizador de Estilos Modernos (Evita erro "oklab")
+                    const allElements = clonedDoc.querySelectorAll('*') as NodeListOf<HTMLElement>
+                    allElements.forEach(el => {
+                        const style = window.getComputedStyle(el)
+
+                        // Limpa filtros
+                        if (style.filter && style.filter !== 'none') el.style.filter = 'none'
+
+                        // Substitui cores OKLCH/OKLAB por fallbacks seguros
+                        if (style.color.includes('okl')) el.style.color = '#1e293b'
+                        if (style.backgroundColor.includes('okl')) el.style.backgroundColor = '#ffffff'
+                        if (style.borderColor.includes('okl')) el.style.borderColor = '#e2e8f0'
+                        if (style.backgroundImage && style.backgroundImage.includes('okl')) {
+                            el.style.backgroundImage = 'none'
+                            el.style.backgroundColor = '#1d4ed8' // Azul T&S
+                        }
+                    })
+                }
             })
 
             const imgData = canvas.toDataURL('image/jpeg', 0.95)
