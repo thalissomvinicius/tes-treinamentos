@@ -1,12 +1,25 @@
 'use client'
 
-import React from 'react'
+import React, { useEffect } from 'react'
+import { useSearchParams } from 'next/navigation'
 
 export default function ApostilaPage() {
+    const searchParams = useSearchParams()
+
+    useEffect(() => {
+        // Se a URL contiver ?print=true, dispara a impressão após um breve delay para garantir o carregamento
+        if (searchParams.get('print') === 'true') {
+            const timer = setTimeout(() => {
+                window.print()
+            }, 500)
+            return () => clearTimeout(timer)
+        }
+    }, [searchParams])
+
     return (
-        <div className="min-h-screen bg-white text-slate-900 font-sans print:bg-white print:text-black">
+        <div className="min-h-screen bg-white text-slate-900 font-sans print:bg-white print:text-black overflow-x-hidden">
             {/* Botão de Impressão (Oculto na impressão) */}
-            <div className="fixed bottom-8 right-8 z-50 print:hidden">
+            <div className="fixed bottom-8 right-8 z-50 print:hidden sm:block hidden">
                 <button
                     onClick={() => window.print()}
                     className="bg-blue-700 hover:bg-blue-800 text-white font-bold px-6 py-4 rounded-2xl shadow-2xl flex items-center gap-2 transition-all hover:scale-105 active:scale-95"
@@ -18,7 +31,7 @@ export default function ApostilaPage() {
                 </button>
             </div>
 
-            <div className="max-w-[210mm] mx-auto bg-white p-0 sm:p-8 lg:p-12 shadow-2xl print:shadow-none print:p-0">
+            <div className="w-full max-w-[210mm] mx-auto bg-white p-0 sm:p-8 lg:p-12 shadow-none sm:shadow-2xl print:shadow-none print:p-0">
                 {/* ────── PRINT HEADER (Only visible on print) ────── */}
                 <div className="hidden print:block fixed top-0 left-0 right-0 h-[20mm] border-b border-slate-200 px-[20mm] py-4 bg-white z-[100]">
                     <div className="flex justify-between items-center h-full">
