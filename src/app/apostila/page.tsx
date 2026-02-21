@@ -45,7 +45,7 @@ function ApostilaContent() {
                     const allElements = clonedDoc.querySelectorAll('*') as NodeListOf<HTMLElement>
                     allElements.forEach(el => {
                         const style = window.getComputedStyle(el)
-                        const isBad = (val: string) => val && (val.includes('oklch') || val.includes('oklab'))
+                        const isBad = (val: string) => val && (val.includes('okl') || val.includes('lab(') || val.includes('color('))
 
                         // Substituição garantida por HEX seguro
                         if (isBad(style.color)) el.style.color = '#1e293b'
@@ -62,8 +62,8 @@ function ApostilaContent() {
                         if (isBad(style.fill)) el.style.fill = '#1e293b'
                         if (isBad(style.stroke)) el.style.stroke = '#1e293b'
 
-                        // Garante que o backgroundImage não tenha oklch
-                        if (style.backgroundImage && style.backgroundImage.includes('okl')) {
+                        // Garante que o backgroundImage não tenha cores modernas
+                        if (style.backgroundImage && isBad(style.backgroundImage)) {
                             el.style.backgroundImage = 'none'
                         }
                     })
