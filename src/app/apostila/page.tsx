@@ -88,6 +88,7 @@ function ApostilaContent() {
             const contentWidth = pdfWidth - margin * 2
             const ratio = contentWidth / canvas.width
             const pageHeightPx = (pdfHeight - margin * 2) / ratio
+            const safePageHeightPx = Math.max(200, pageHeightPx - 40)
             const ctx = canvas.getContext('2d')
 
             const findBreak = (targetY: number) => {
@@ -121,8 +122,8 @@ function ApostilaContent() {
             let pageIndex = 0
             while (y < canvas.height) {
                 const remaining = canvas.height - y
-                let sliceHeight = Math.min(pageHeightPx, remaining)
-                if (remaining > pageHeightPx) {
+                let sliceHeight = Math.min(safePageHeightPx, remaining)
+                if (remaining > safePageHeightPx) {
                     const target = y + sliceHeight
                     const breakY = findBreak(target)
                     sliceHeight = Math.max(40, breakY - y)
@@ -204,7 +205,7 @@ function ApostilaContent() {
                 {/* ────── PRINT FOOTER (Only visible on print) ────── */}
                 <div className="print-only fixed bottom-0 left-0 right-0 h-[15mm] border-t border-slate-100 px-[20mm] py-4 bg-white z-[100] text-center pointer-events-none">
                     <div className="text-[8px] font-bold text-slate-300 uppercase tracking-widest">
-                        © {new Date().getFullYear()} T&S CURSOS • DOCUMENTO PARA USO DIDÁTICO • WWW.TES-TREINAMENTOS.VERCEL.APP
+                        © T&S CURSOS • DOCUMENTO PARA USO DIDÁTICO • WWW.TES-TREINAMENTOS.VERCEL.APP
                     </div>
                 </div>
 
@@ -593,11 +594,6 @@ function ApostilaContent() {
                     </div>
                 </section>
 
-                {/* Footer de Página */}
-                <footer className="mt-8 sm:mt-20 py-4 sm:py-8 border-t border-slate-100 flex flex-col sm:flex-row justify-between items-center gap-2 sm:gap-4 text-[8px] sm:text-[10px] text-slate-300 font-bold uppercase tracking-widest px-6 sm:px-12 print:hidden text-center sm:text-left">
-                    <div>T&S Cursos • Material Técnico Autorizado</div>
-                    <div>Página {new Date().toLocaleDateString('pt-BR')}</div>
-                </footer>
             </div>
 
             <style jsx global>{`
