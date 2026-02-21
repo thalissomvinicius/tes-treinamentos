@@ -266,8 +266,8 @@ export default function AdminPage() {
                                             className="w-full border border-slate-200 rounded-xl px-4 py-3 text-slate-800 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition text-sm font-mono"
                                         />
                                     </div>
-                                    <div className="flex items-end">
-                                        <label className="flex items-center gap-3 cursor-pointer px-4 py-3 bg-slate-50 rounded-xl border border-slate-200 w-full">
+                                    <div className="flex flex-col gap-3 justify-end">
+                                        <label className="flex items-center gap-3 cursor-pointer px-4 py-3 bg-slate-50 rounded-xl border border-slate-200 w-full hover:bg-slate-100 transition">
                                             <input
                                                 type="checkbox"
                                                 checked={formAccess}
@@ -277,6 +277,23 @@ export default function AdminPage() {
                                             <span className="text-sm font-semibold text-slate-700">
                                                 Liberar acesso ao curso
                                             </span>
+                                        </label>
+
+                                        <label className="flex items-center gap-3 cursor-pointer px-4 py-3 bg-amber-50 rounded-xl border border-amber-200 w-full hover:bg-amber-100 transition">
+                                            <input
+                                                type="checkbox"
+                                                checked={formIsAdmin}
+                                                onChange={e => setFormIsAdmin(e.target.checked)}
+                                                className="w-5 h-5 text-amber-600 rounded border-amber-300 focus:ring-amber-500"
+                                            />
+                                            <div className="flex flex-col">
+                                                <span className="text-sm font-bold text-amber-800">
+                                                    Usuário Administrador
+                                                </span>
+                                                <span className="text-[10px] text-amber-600 font-medium">
+                                                    Acesso total ao painel
+                                                </span>
+                                            </div>
                                         </label>
                                     </div>
                                 </div>

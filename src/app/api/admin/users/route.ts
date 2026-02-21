@@ -33,47 +33,98 @@ function buildWelcomeEmailHtml(params: {
         : 'Seu acesso será liberado assim que o pagamento for confirmado.'
 
     return `
-        <div style="margin:0;padding:0;background:#e2e8f0;font-family:Arial,Helvetica,sans-serif;color:#0f172a;">
-            <div style="max-width:640px;margin:0 auto;padding:26px 14px;">
-                <div style="background:#0f172a;border-radius:22px 22px 18px 18px;padding:26px 22px;text-align:center;color:#ffffff;">
-                    <div style="font-size:20px;font-weight:800;letter-spacing:0.08em;">T&amp;S CURSOS</div>
-                    <div style="margin-top:6px;font-size:13px;color:#cbd5f5;">eSocial na Prática — SST</div>
-                    <div style="margin-top:18px;">
-                        <span style="display:inline-block;width:44px;height:44px;border-radius:999px;background:#1d4ed8;color:#ffffff;line-height:44px;text-align:center;font-size:20px;">👩‍💻</span>
-                        <span style="display:inline-block;width:44px;height:44px;border-radius:999px;background:#2563eb;color:#ffffff;line-height:44px;text-align:center;font-size:20px;margin:0 6px;">🧑‍🏫</span>
-                        <span style="display:inline-block;width:44px;height:44px;border-radius:999px;background:#1e40af;color:#ffffff;line-height:44px;text-align:center;font-size:20px;">🧑‍🎓</span>
+        <!DOCTYPE html>
+        <html lang="pt-BR">
+        <head>
+            <meta charset="UTF-8">
+            <meta name="viewport" content="width=device-width, initial-scale=1.0">
+            <title>Bem-vindo à T&S Cursos</title>
+            <style>
+                @media only screen and (max-width: 600px) {
+                    .container { padding: 10px !important; }
+                    .content { padding: 20px 15px !important; }
+                    .header { padding: 20px 15px !important; }
+                    h1 { font-size: 18px !important; }
+                    p { font-size: 14px !important; }
+                    .btn { display: block !important; width: 100% !important; max-width: none !important; box-sizing: border-box !important; }
+                }
+            </style>
+        </head>
+        <body style="margin:0;padding:0;background-color:#e2e8f0;font-family:'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;color:#0f172a;">
+            <div class="container" style="max-width:600px;margin:0 auto;padding:40px 20px;">
+                <!-- Header with Characters -->
+                <div class="header" style="background:linear-gradient(135deg, #0f172a 0%, #1e293b 100%);border-radius:24px 24px 0 0;padding:40px 30px;text-align:center;color:#ffffff;position:relative;overflow:hidden;">
+                    <!-- Decorative Circle -->
+                    <div style="position:absolute;top:-50px;left:-50px;width:150px;height:150px;background:rgba(255,255,255,0.05);border-radius:50%;"></div>
+                    
+                    <div style="font-size:24px;font-weight:800;letter-spacing:0.05em;margin-bottom:8px;">T&amp;S CURSOS</div>
+                    <div style="font-size:14px;color:#94a3b8;font-weight:500;text-transform:uppercase;letter-spacing:0.1em;">eSocial na Prática — SST</div>
+                    
+                    <!-- Characters / Avatars -->
+                    <div style="margin-top:30px;display:flex;justify-content:center;gap:15px;">
+                        <div style="background:#3b82f6;width:56px;height:56px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:28px;box-shadow:0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);border:3px solid rgba(255,255,255,0.2);">👩‍💻</div>
+                        <div style="background:#2563eb;width:56px;height:56px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:28px;box-shadow:0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);border:3px solid rgba(255,255,255,0.2);">👷</div>
+                        <div style="background:#1d4ed8;width:56px;height:56px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:28px;box-shadow:0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);border:3px solid rgba(255,255,255,0.2);">👨‍🏫</div>
                     </div>
                 </div>
-                <div style="background:#ffffff;border-radius:18px;padding:22px 20px;border:1px solid #e2e8f0;margin-top:-14px;box-shadow:0 14px 28px rgba(15,23,42,0.08);">
-                    <h1 style="font-size:20px;margin:0 0 10px;color:#0f172a;">Olá${name ? `, ${name}` : ''}!</h1>
-                    <p style="margin:0 0 14px;font-size:14px;line-height:1.6;color:#334155;">
-                        Seu cadastro foi criado com sucesso. ${accessLine}
+
+                <!-- Main Content -->
+                <div class="content" style="background:#ffffff;border-radius:0 0 24px 24px;padding:40px 30px;box-shadow:0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);">
+                    <h1 style="font-size:22px;font-weight:700;margin:0 0 16px;color:#1e293b;text-align:center;">
+                        Bem-vindo(a)${name ? `, ${name}` : ''}!
+                    </h1>
+                    
+                    <p style="margin:0 0 24px;font-size:16px;line-height:1.6;color:#475569;text-align:center;">
+                        Seu cadastro foi realizado com sucesso. ${accessLine}
                     </p>
-                    <div style="background:#eff6ff;border-radius:14px;padding:16px;border:1px solid #bfdbfe;margin:18px 0;">
-                        <div style="font-size:12px;color:#1d4ed8;text-transform:uppercase;letter-spacing:0.08em;font-weight:700;margin-bottom:8px;">Dados de acesso</div>
-                        <div style="font-size:14px;color:#0f172a;margin-bottom:6px;"><strong>E-mail:</strong> ${email}</div>
-                        <div style="font-size:14px;color:#0f172a;"><strong>Senha:</strong> ${password}</div>
+
+                    <!-- Credentials Box -->
+                    <div style="background:#f8fafc;border:1px solid #e2e8f0;border-radius:16px;padding:24px;margin:30px 0;">
+                        <div style="text-align:center;font-size:12px;color:#64748b;font-weight:600;text-transform:uppercase;letter-spacing:0.05em;margin-bottom:12px;">Suas Credenciais</div>
+                        
+                        <div style="margin-bottom:12px;">
+                            <div style="font-size:13px;color:#94a3b8;margin-bottom:4px;">E-mail de acesso</div>
+                            <div style="font-size:16px;color:#0f172a;font-weight:600;font-family:monospace;">${email}</div>
+                        </div>
+                        
+                        <div>
+                            <div style="font-size:13px;color:#94a3b8;margin-bottom:4px;">Senha temporária</div>
+                            <div style="font-size:16px;color:#0f172a;font-weight:600;font-family:monospace;background:#e2e8f0;padding:4px 8px;border-radius:6px;display:inline-block;">${password}</div>
+                        </div>
                     </div>
-                    <a href="${loginUrl}" style="display:block;background:#1d4ed8;color:#ffffff;text-decoration:none;font-weight:700;padding:12px 18px;border-radius:12px;font-size:14px;text-align:center;max-width:260px;margin:0 auto;">Acessar o painel</a>
-                    <div style="margin-top:22px;">
-                        <div style="font-size:13px;font-weight:700;color:#1e293b;margin-bottom:8px;">Gratificações do curso</div>
-                        <ul style="padding-left:18px;margin:0;color:#475569;font-size:13px;line-height:1.7;">
-                            <li>Certificado digital de 40 horas com código de validação</li>
-                            <li>Acesso vitalício ao conteúdo e atualizações futuras</li>
-                            <li>Quizzes de fixação por módulo</li>
-                            <li>Apostila em PDF para estudo offline</li>
-                            <li>Suporte direto pelo WhatsApp</li>
+
+                    <!-- CTA Button -->
+                    <div style="text-align:center;margin:30px 0;">
+                        <a href="${loginUrl}" class="btn" style="display:inline-block;background:#2563eb;color:#ffffff;text-decoration:none;font-weight:600;padding:16px 32px;border-radius:12px;font-size:16px;box-shadow:0 4px 6px -1px rgba(37, 99, 235, 0.2);transition:background 0.2s;">
+                            Acessar Plataforma
+                        </a>
+                    </div>
+
+                    <!-- Features List -->
+                    <div style="border-top:1px solid #f1f5f9;margin-top:30px;padding-top:30px;">
+                        <div style="font-size:14px;font-weight:600;color:#334155;margin-bottom:16px;text-align:center;">O que você vai encontrar:</div>
+                        <ul style="padding:0;margin:0;list-style:none;">
+                            <li style="margin-bottom:12px;display:flex;align-items:center;color:#64748b;font-size:14px;">
+                                <span style="color:#10b981;margin-right:10px;font-size:16px;">✓</span> Certificado válido em todo território nacional
+                            </li>
+                            <li style="margin-bottom:12px;display:flex;align-items:center;color:#64748b;font-size:14px;">
+                                <span style="color:#10b981;margin-right:10px;font-size:16px;">✓</span> Conteúdo atualizado com as normas vigentes
+                            </li>
+                            <li style="margin-bottom:12px;display:flex;align-items:center;color:#64748b;font-size:14px;">
+                                <span style="color:#10b981;margin-right:10px;font-size:16px;">✓</span> Suporte direto com especialistas
+                            </li>
                         </ul>
                     </div>
-                    <div style="margin-top:20px;font-size:12px;color:#64748b;line-height:1.6;">
-                        Recomendamos que você altere sua senha após o primeiro acesso.
-                    </div>
                 </div>
-                <div style="text-align:center;font-size:11px;color:#64748b;margin-top:14px;">
-                    © ${new Date().getFullYear()} T&amp;S Cursos. Todos os direitos reservados.
+
+                <!-- Footer -->
+                <div style="text-align:center;margin-top:30px;color:#94a3b8;font-size:12px;">
+                    <p style="margin:0 0 8px;">Dúvidas? Responda a este e-mail.</p>
+                    <p style="margin:0;">© ${new Date().getFullYear()} T&S Cursos. Todos os direitos reservados.</p>
                 </div>
             </div>
-        </div>
+        </body>
+        </html>
     `
 }
 
