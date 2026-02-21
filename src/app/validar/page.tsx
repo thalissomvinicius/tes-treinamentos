@@ -1,12 +1,12 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, Suspense } from 'react'
 import { supabase } from '@/lib/supabase'
 import Navbar from '@/components/Navbar'
 import Link from 'next/link'
 import { useSearchParams } from 'next/navigation'
 
-export default function ValidarPage() {
+function ValidarContent() {
     const [code, setCode] = useState('')
     const [loading, setLoading] = useState(false)
     const [result, setResult] = useState<{ user_name: string; created_at: string } | null>(null)
@@ -137,5 +137,17 @@ export default function ValidarPage() {
                 </div>
             </main>
         </div>
+    )
+}
+
+export default function ValidarPage() {
+    return (
+        <Suspense fallback={
+            <div className="min-h-screen bg-slate-50 flex items-center justify-center">
+                <div className="w-10 h-10 border-4 border-blue-700 border-t-transparent rounded-full animate-spin" />
+            </div>
+        }>
+            <ValidarContent />
+        </Suspense>
     )
 }
