@@ -41,7 +41,7 @@ export async function middleware(req: NextRequest) {
         if (!session) {
             return NextResponse.redirect(new URL('/login', req.url))
         }
-        if (!isAdmin(session.user.email)) {
+        if (!isAdmin(session.user.email, session.user.user_metadata)) {
             return NextResponse.redirect(new URL('/dashboard', req.url))
         }
         return res

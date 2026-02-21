@@ -85,6 +85,8 @@ export async function POST(req: NextRequest) {
         }
 
         // Generate PDF
+        const origin = new URL(req.url).origin
+        const verifyUrl = `${origin}/validar?codigo=${encodeURIComponent(code)}`
         const pdfBuffer = await generateCertificatePDF({
             userName,
             courseName: 'eSocial na Prática — SST',
@@ -95,6 +97,7 @@ export async function POST(req: NextRequest) {
                 month: 'long',
                 year: 'numeric',
             }),
+            verifyUrl,
         })
 
         return new Response(pdfBuffer, {

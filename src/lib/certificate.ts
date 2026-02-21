@@ -1,4 +1,5 @@
 import jsPDF from 'jspdf'
+import QRCode from 'qrcode'
 
 export interface CertificateProps {
     userName: string
@@ -6,10 +7,11 @@ export interface CertificateProps {
     issuedBy: string
     code: string
     date: string
+    verifyUrl?: string
 }
 
 export async function generateCertificatePDF(props: CertificateProps): Promise<ArrayBuffer> {
-    const { userName, courseName, issuedBy, code, date } = props
+    const { userName, courseName, issuedBy, code, date, verifyUrl } = props
 
     // Landscape A4: 297 x 210 mm
     const doc = new jsPDF({ orientation: 'landscape', unit: 'mm', format: 'a4' })
@@ -20,8 +22,8 @@ export async function generateCertificatePDF(props: CertificateProps): Promise<A
     //  COLORS
     // ──────────────────────────────────────
     const Navy = { r: 15, g: 23, b: 42 } // slate-900 / Deep Navy
-    const Gold = { r: 180, g: 144, b: 66 }
-    const LightGold = { r: 212, g: 175, b: 55 }
+    const Gold = { r: 29, g: 78, b: 216 }
+    const LightGold = { r: 59, g: 130, b: 246 }
     const SoftGray = { r: 248, g: 250, b: 252 } // slate-50
 
     // ──────────────────────────────────────
@@ -117,7 +119,7 @@ export async function generateCertificatePDF(props: CertificateProps): Promise<A
     //  DIGITAL SEAL / BADGE (Circular Gold Seal)
     // ──────────────────────────────────────
     // Moved lower and more to the right to avoid overlap
-    const sealX = w - 50
+    const sealX = w - 85
     const sealY = 172
     const sealR = 16
 
@@ -175,6 +177,25 @@ export async function generateCertificatePDF(props: CertificateProps): Promise<A
     doc.setFontSize(7)
     doc.text(`CÓDIGO DE AUTENTICIDADE: ${code}`, w / 2 + 7.5, h - 10, { align: 'center' })
     doc.text('Documento digital autêntico.', w / 2 + 7.5, h - 6, { align: 'center' })
+
+    if (verifyUrl) {
+        const qrDataUrl = await QRCode.toDataURL(verifyUrl, {
+            width: 280,
+            margin: 0,
+            color: {
+                dark: '#1d4ed8',
+                light: '#ffffff',
+            },
+        })
+        const qrSize = 28
+        const qrX = w - 45
+        const qrY = h - 45
+        doc.addImage(qrDataUrl, 'PNG', qrX, qrY, qrSize, qrSize)
+        doc.setFont('helvetica', 'bold')
+        doc.setFontSize(7)
+        doc.setTextColor(Gold.r, Gold.g, Gold.b)
+        doc.text('VALIDAR QR CODE', qrX + qrSize / 2, qrY - 2, { align: 'center' })
+    }
 
     return doc.output('arraybuffer')
 }

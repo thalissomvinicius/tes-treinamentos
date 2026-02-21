@@ -11,6 +11,7 @@ interface User {
     name: string
     created_at: string
     has_access: boolean
+    is_admin: boolean
 }
 
 export default function AdminPage() {
@@ -24,6 +25,7 @@ export default function AdminPage() {
     const [formEmail, setFormEmail] = useState('')
     const [formPassword, setFormPassword] = useState('')
     const [formAccess, setFormAccess] = useState(true)
+    const [formIsAdmin, setFormIsAdmin] = useState(false)
     const [formLoading, setFormLoading] = useState(false)
     const [formError, setFormError] = useState('')
     const [formSuccess, setFormSuccess] = useState('')
@@ -93,6 +95,7 @@ export default function AdminPage() {
                     email: formEmail,
                     password: formPassword,
                     grantAccess: formAccess,
+                    isAdminUser: formIsAdmin,
                 }),
             })
             const data = await res.json()
@@ -113,6 +116,7 @@ export default function AdminPage() {
                 setFormEmail('')
                 setFormPassword('')
                 setFormAccess(true)
+                setFormIsAdmin(false)
                 loadUsers()
                 if (!data.purchase_error && !emailFailed) {
                     setTimeout(() => {
@@ -130,7 +134,7 @@ export default function AdminPage() {
         }
     }
 
-    async function handleToggleAccess(user: User) {
+    async function handleSetAccess(user: User, grantAccess: boolean) {
         try {
             const res = await fetch('/api/admin/users', {
                 method: 'PATCH',
@@ -141,7 +145,7 @@ export default function AdminPage() {
                 body: JSON.stringify({
                     userId: user.id,
                     email: user.email,
-                    grantAccess: !user.has_access,
+                    grantAccess,
                 }),
             })
 
@@ -276,6 +280,21 @@ export default function AdminPage() {
                                         </label>
                                     </div>
                                 </div>
+                                <div className="grid sm:grid-cols-2 gap-4">
+                                    <div className="flex items-end">
+                                        <label className="flex items-center gap-3 cursor-pointer px-4 py-3 bg-slate-50 rounded-xl border border-slate-200 w-full">
+                                            <input
+                                                type="checkbox"
+                                                checked={formIsAdmin}
+                                                onChange={e => setFormIsAdmin(e.target.checked)}
+                                                className="w-5 h-5 text-amber-500 rounded border-slate-300 focus:ring-amber-400"
+                                            />
+                                            <span className="text-sm font-semibold text-slate-700">
+                                                Definir como administrador
+                                            </span>
+                                        </label>
+                                    </div>
+                                </div>
 
                                 {formError && (
                                     <p className="text-red-500 text-sm bg-red-50 rounded-lg p-3">{formError}</p>
@@ -375,11 +394,18 @@ export default function AdminPage() {
                                         </thead>
                                         <tbody>
                                             {filteredUsers.map(user => (
-                                                <tr key={user.id} className="border-b border-slate-50 hover:bg-slate-50/50 transition">
+                                            <tr key={user.id} className="border-b border-slate-50 hover:bg-slate-50/50 transition">
                                                     <td className="px-6 py-4">
+                                                    <div className="flex items-center gap-2">
                                                         <p className="font-semibold text-slate-800 text-sm">
                                                             {user.name || '—'}
                                                         </p>
+                                                        {user.is_admin && (
+                                                            <span className="text-[10px] uppercase tracking-widest font-bold text-amber-700 bg-amber-100 px-2 py-1 rounded-full">
+                                                                Admin
+                                                            </span>
+                                                        )}
+                                                    </div>
                                                         <p className="text-slate-500 text-xs mt-0.5">{user.email}</p>
                                                     </td>
                                                     <td className="px-6 py-4">
@@ -389,7 +415,7 @@ export default function AdminPage() {
                                                     </td>
                                                     <td className="px-6 py-4 text-center">
                                                         <button
-                                                            onClick={() => handleToggleAccess(user)}
+                                                            onClick={() => handleSetAccess(user, !user.has_access)}
                                                             className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-bold transition-all ${user.has_access
                                                                 ? 'bg-green-100 text-green-700 hover:bg-green-200'
                                                                 : 'bg-red-100 text-red-600 hover:bg-red-200'
@@ -417,15 +443,26 @@ export default function AdminPage() {
                                                                 </button>
                                                             </div>
                                                         ) : (
-                                                            <button
-                                                                onClick={() => setDeleteConfirm(user.id)}
-                                                                className="text-slate-400 hover:text-red-500 transition"
-                                                                title="Excluir usuário"
-                                                            >
-                                                                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                                                                </svg>
-                                                            </button>
+                                                            <div className="flex items-center justify-end gap-2">
+                                                                <button
+                                                                    onClick={() => handleSetAccess(user, !user.has_access)}
+                                                                    className={`text-xs font-semibold px-3 py-1.5 rounded-lg transition ${user.has_access
+                                                                        ? 'bg-red-50 text-red-600 hover:bg-red-100'
+                                                                        : 'bg-green-50 text-green-700 hover:bg-green-100'
+                                                                        }`}
+                                                                >
+                                                                    {user.has_access ? 'Remover acesso' : 'Liberar acesso'}
+                                                                </button>
+                                                                <button
+                                                                    onClick={() => setDeleteConfirm(user.id)}
+                                                                    className="text-slate-400 hover:text-red-500 transition"
+                                                                    title="Excluir usuário"
+                                                                >
+                                                                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                                                                    </svg>
+                                                                </button>
+                                                            </div>
                                                         )}
                                                     </td>
                                                 </tr>
@@ -440,11 +477,18 @@ export default function AdminPage() {
                                         <div key={user.id} className="p-4">
                                             <div className="flex items-start justify-between mb-2">
                                                 <div>
-                                                    <p className="font-semibold text-slate-800 text-sm">{user.name || '—'}</p>
+                                                    <div className="flex items-center gap-2">
+                                                        <p className="font-semibold text-slate-800 text-sm">{user.name || '—'}</p>
+                                                        {user.is_admin && (
+                                                            <span className="text-[10px] uppercase tracking-widest font-bold text-amber-700 bg-amber-100 px-2 py-1 rounded-full">
+                                                                Admin
+                                                            </span>
+                                                        )}
+                                                    </div>
                                                     <p className="text-slate-500 text-xs">{user.email}</p>
                                                 </div>
                                                 <button
-                                                    onClick={() => handleToggleAccess(user)}
+                                                    onClick={() => handleSetAccess(user, !user.has_access)}
                                                     className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-bold transition-all ${user.has_access
                                                         ? 'bg-green-100 text-green-700'
                                                         : 'bg-red-100 text-red-600'
@@ -474,16 +518,27 @@ export default function AdminPage() {
                                                         </button>
                                                     </div>
                                                 ) : (
-                                                    <button
-                                                        onClick={() => setDeleteConfirm(user.id)}
-                                                        className="text-slate-400 hover:text-red-500 transition"
-                                                        title="Excluir Usuário"
-                                                        aria-label="Excluir Usuário"
-                                                    >
-                                                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                                                        </svg>
-                                                    </button>
+                                                    <div className="flex items-center gap-2">
+                                                        <button
+                                                            onClick={() => handleSetAccess(user, !user.has_access)}
+                                                            className={`text-xs font-semibold px-3 py-1 rounded-lg ${user.has_access
+                                                                ? 'bg-red-50 text-red-600'
+                                                                : 'bg-green-50 text-green-700'
+                                                                }`}
+                                                        >
+                                                            {user.has_access ? 'Remover acesso' : 'Liberar acesso'}
+                                                        </button>
+                                                        <button
+                                                            onClick={() => setDeleteConfirm(user.id)}
+                                                            className="text-slate-400 hover:text-red-500 transition"
+                                                            title="Excluir Usuário"
+                                                            aria-label="Excluir Usuário"
+                                                        >
+                                                            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                                                            </svg>
+                                                        </button>
+                                                    </div>
                                                 )}
                                             </div>
                                         </div>

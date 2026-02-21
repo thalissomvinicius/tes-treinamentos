@@ -1,20 +1,20 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { supabase } from '@/lib/supabase'
 import Navbar from '@/components/Navbar'
 import Link from 'next/link'
+import { useSearchParams } from 'next/navigation'
 
 export default function ValidarPage() {
     const [code, setCode] = useState('')
     const [loading, setLoading] = useState(false)
     const [result, setResult] = useState<{ user_name: string; created_at: string } | null>(null)
     const [error, setError] = useState('')
+    const [autoVerified, setAutoVerified] = useState(false)
+    const searchParams = useSearchParams()
 
-    async function handleVerify(e: React.FormEvent) {
-        e.preventDefault()
-        if (!code.trim()) return
-
+    async function verifyCodeValue(value: string) {
         setLoading(true)
         setError('')
         setResult(null)
@@ -23,7 +23,7 @@ export default function ValidarPage() {
             const { data, error: supabaseError } = await supabase
                 .from('certificates')
                 .select('*')
-                .eq('code', code.trim())
+                .eq('code', value.trim())
                 .single()
 
             if (supabaseError || !data) {
@@ -37,6 +37,20 @@ export default function ValidarPage() {
             setLoading(false)
         }
     }
+
+    async function handleVerify(e: React.FormEvent) {
+        e.preventDefault()
+        if (!code.trim()) return
+        await verifyCodeValue(code)
+    }
+
+    useEffect(() => {
+        const codeParam = searchParams.get('codigo')
+        if (!codeParam || autoVerified) return
+        setCode(codeParam)
+        verifyCodeValue(codeParam)
+        setAutoVerified(true)
+    }, [searchParams, autoVerified])
 
     return (
         <div className="min-h-screen bg-slate-50">

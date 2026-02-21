@@ -5,11 +5,19 @@ import nodemailer from 'nodemailer'
 
 // Helper: verify admin from request
 async function verifyAdmin(req: NextRequest) {
-    // Check the x-user-email header sent by the client
     const email = req.headers.get('x-user-email')
-    console.log('[Admin API] x-user-email header:', email, '| isAdmin:', isAdmin(email))
-    if (!email || !isAdmin(email)) return null
-    return email
+    if (!email) return null
+    if (isAdmin(email)) return email
+
+    const supabase = getSupabaseAdmin()
+    const { data, error } = await supabase.auth.admin.listUsers()
+    if (error) {
+        console.error('Error checking admin user:', error)
+        return null
+    }
+    const adminMatch = data.users.find(user => user.email?.toLowerCase() === email.toLowerCase())
+    if (adminMatch && isAdmin(email, adminMatch.user_metadata)) return email
+    return null
 }
 
 function buildWelcomeEmailHtml(params: {
@@ -25,23 +33,28 @@ function buildWelcomeEmailHtml(params: {
         : 'Seu acesso será liberado assim que o pagamento for confirmado.'
 
     return `
-        <div style="margin:0;padding:0;background:#f8fafc;font-family:Arial,Helvetica,sans-serif;color:#0f172a;">
-            <div style="max-width:620px;margin:0 auto;padding:32px 20px;">
-                <div style="background:#ffffff;border-radius:16px;padding:28px;border:1px solid #e2e8f0;box-shadow:0 10px 30px rgba(15,23,42,0.06);">
-                    <div style="text-align:center;margin-bottom:24px;">
-                        <div style="font-size:22px;font-weight:800;color:#1d4ed8;">T&amp;S Cursos</div>
-                        <div style="margin-top:6px;font-size:14px;color:#64748b;">Acesso ao curso eSocial na Prática — SST</div>
+        <div style="margin:0;padding:0;background:#e2e8f0;font-family:Arial,Helvetica,sans-serif;color:#0f172a;">
+            <div style="max-width:640px;margin:0 auto;padding:26px 14px;">
+                <div style="background:#0f172a;border-radius:22px 22px 18px 18px;padding:26px 22px;text-align:center;color:#ffffff;">
+                    <div style="font-size:20px;font-weight:800;letter-spacing:0.08em;">T&amp;S CURSOS</div>
+                    <div style="margin-top:6px;font-size:13px;color:#cbd5f5;">eSocial na Prática — SST</div>
+                    <div style="margin-top:18px;">
+                        <span style="display:inline-block;width:44px;height:44px;border-radius:999px;background:#1d4ed8;color:#ffffff;line-height:44px;text-align:center;font-size:20px;">👩‍💻</span>
+                        <span style="display:inline-block;width:44px;height:44px;border-radius:999px;background:#2563eb;color:#ffffff;line-height:44px;text-align:center;font-size:20px;margin:0 6px;">🧑‍🏫</span>
+                        <span style="display:inline-block;width:44px;height:44px;border-radius:999px;background:#1e40af;color:#ffffff;line-height:44px;text-align:center;font-size:20px;">🧑‍🎓</span>
                     </div>
-                    <h1 style="font-size:20px;margin:0 0 10px;">Olá${name ? `, ${name}` : ''}!</h1>
+                </div>
+                <div style="background:#ffffff;border-radius:18px;padding:22px 20px;border:1px solid #e2e8f0;margin-top:-14px;box-shadow:0 14px 28px rgba(15,23,42,0.08);">
+                    <h1 style="font-size:20px;margin:0 0 10px;color:#0f172a;">Olá${name ? `, ${name}` : ''}!</h1>
                     <p style="margin:0 0 14px;font-size:14px;line-height:1.6;color:#334155;">
                         Seu cadastro foi criado com sucesso. ${accessLine}
                     </p>
-                    <div style="background:#f1f5f9;border-radius:12px;padding:16px;border:1px solid #e2e8f0;margin:18px 0;">
-                        <div style="font-size:12px;color:#64748b;text-transform:uppercase;letter-spacing:0.08em;font-weight:700;margin-bottom:8px;">Dados de acesso</div>
+                    <div style="background:#eff6ff;border-radius:14px;padding:16px;border:1px solid #bfdbfe;margin:18px 0;">
+                        <div style="font-size:12px;color:#1d4ed8;text-transform:uppercase;letter-spacing:0.08em;font-weight:700;margin-bottom:8px;">Dados de acesso</div>
                         <div style="font-size:14px;color:#0f172a;margin-bottom:6px;"><strong>E-mail:</strong> ${email}</div>
                         <div style="font-size:14px;color:#0f172a;"><strong>Senha:</strong> ${password}</div>
                     </div>
-                    <a href="${loginUrl}" style="display:inline-block;background:#16a34a;color:#ffffff;text-decoration:none;font-weight:700;padding:12px 22px;border-radius:10px;font-size:14px;">Acessar o painel</a>
+                    <a href="${loginUrl}" style="display:block;background:#1d4ed8;color:#ffffff;text-decoration:none;font-weight:700;padding:12px 18px;border-radius:12px;font-size:14px;text-align:center;max-width:260px;margin:0 auto;">Acessar o painel</a>
                     <div style="margin-top:22px;">
                         <div style="font-size:13px;font-weight:700;color:#1e293b;margin-bottom:8px;">Gratificações do curso</div>
                         <ul style="padding-left:18px;margin:0;color:#475569;font-size:13px;line-height:1.7;">
@@ -52,11 +65,11 @@ function buildWelcomeEmailHtml(params: {
                             <li>Suporte direto pelo WhatsApp</li>
                         </ul>
                     </div>
-                    <div style="margin-top:22px;font-size:12px;color:#64748b;line-height:1.6;">
+                    <div style="margin-top:20px;font-size:12px;color:#64748b;line-height:1.6;">
                         Recomendamos que você altere sua senha após o primeiro acesso.
                     </div>
                 </div>
-                <div style="text-align:center;font-size:11px;color:#94a3b8;margin-top:16px;">
+                <div style="text-align:center;font-size:11px;color:#64748b;margin-top:14px;">
                     © ${new Date().getFullYear()} T&amp;S Cursos. Todos os direitos reservados.
                 </div>
             </div>
@@ -248,7 +261,7 @@ export async function GET(req: NextRequest) {
 
         // Merge data
         const users = authData.users
-            .filter(u => !isAdmin(u.email)) // Don't show admin in the list
+            .filter(u => !isAdmin(u.email, u.user_metadata))
             .map(u => {
                 const purchase = purchases?.find(p => p.user_id === u.id || p.email === u.email)
                 return {
@@ -257,6 +270,7 @@ export async function GET(req: NextRequest) {
                     name: u.user_metadata?.name || u.user_metadata?.full_name || '',
                     created_at: u.created_at,
                     has_access: purchase?.paid || false,
+                    is_admin: !!u.user_metadata?.is_admin,
                 }
             })
 
@@ -277,7 +291,7 @@ export async function POST(req: NextRequest) {
     const supabase = getSupabaseAdmin()
 
     try {
-        const { name, email, password, grantAccess } = await req.json()
+        const { name, email, password, grantAccess, isAdminUser } = await req.json()
 
         if (!email || !password) {
             return NextResponse.json({ error: 'E-mail e senha são obrigatórios' }, { status: 400 })
@@ -292,7 +306,7 @@ export async function POST(req: NextRequest) {
             email,
             password,
             email_confirm: true, // Skip email verification
-            user_metadata: { name: name || '' },
+            user_metadata: { name: name || '', is_admin: !!isAdminUser },
         })
 
         if (authError) {

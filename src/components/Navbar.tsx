@@ -19,7 +19,7 @@ export default function Navbar({ isLoggedIn: initialIsLoggedIn = false }: { isLo
             const loggedIn = !!session
             setIsLoggedIn(loggedIn)
 
-            if (loggedIn && session.user?.email && isAdmin(session.user.email)) {
+            if (loggedIn && session.user?.email && isAdmin(session.user.email, session.user.user_metadata)) {
                 setIsAdminUser(true)
             }
         }
